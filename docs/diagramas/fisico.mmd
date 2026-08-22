@@ -1,0 +1,290 @@
+%% =============================================================================
+%% Modelo físico - Capa de datos para un copiloto RAG interno
+%% =============================================================================
+%% Tipos, precisión y claves tal como están declarados en
+%% db/estructura/01_schema.sql, sobre PostgreSQL 17 + pgvector 0.8 + btree_gist.
+%% Mermaid erDiagram no expresa restricciones CHECK, EXCLUDE USING gist,
+%% triggers, RLS ni índices: esas reglas están documentadas en
+%% docs/diagramas/fisico_notas.md, que es parte de este mismo modelo físico.
+%% Fuente de autoridad: db/estructura/01_schema.sql, db/indices_vistas/03_indices.sql
+%% y db/indices_vistas/05_seguridad.sql.
+%% =============================================================================
+erDiagram
+    CATEGORIA_PRODUCTO {
+        bigint  id PK
+        text    codigo UK
+        text    nombre
+        boolean activo
+    }
+
+    SEGMENTO_CLIENTE {
+        bigint  id PK
+        text    codigo UK
+        text    nombre
+        boolean activo
+    }
+
+    PERFIL_AUTORIZADO {
+        bigint  id PK
+        text    codigo UK
+        text    nombre
+        boolean activo
+    }
+
+    CLASE_DOCUMENTAL {
+        bigint  id PK
+        text    codigo UK
+        text    nombre
+        text    descripcion
+        boolean activo
+    }
+
+    NIVEL_SENSIBILIDAD {
+        bigint  id PK
+        text    codigo UK
+        text    nombre
+        boolean requiere_auditoria
+        boolean activo
+    }
+
+    MODELO_EMBEDDING {
+        bigint  id PK
+        text    nombre UK
+        text    version UK
+        integer dimension
+        text    metrica "coseno | euclidea | producto_interno"
+        boolean activo
+    }
+
+    PRODUCTO {
+        bigint  id PK
+        text    codigo UK
+        text    nombre
+        text    descripcion
+        bigint  categoria_id FK
+        boolean activo
+    }
+
+    CLIENTE {
+        bigint  id PK
+        text    codigo UK
+        text    razon_social
+        bigint  segmento_id FK
+        boolean activo
+    }
+
+    PROVEEDOR {
+        bigint  id PK
+        text    codigo UK
+        text    razon_social
+        boolean activo
+    }
+
+    PRODUCTO_PROVEEDOR {
+        bigint producto_id PK,FK
+        bigint proveedor_id PK,FK
+    }
+
+    CONDICION_COMERCIAL {
+        bigint      id PK
+        bigint      cliente_id FK
+        bigint      producto_id FK
+        numeric_12_2 precio_unitario "CHECK >= 0"
+        numeric_5_2  descuento_porcentaje "CHECK entre 0 y 100"
+        date        vigente_desde
+        date        vigente_hasta "nulo = sin fin; EXCLUDE gist sin solape por cliente+producto"
+    }
+
+    PEDIDO {
+        bigint id PK
+        text   codigo UK
+        bigint cliente_id FK
+        date   fecha
+        text   estado "CHECK IN (pendiente, en_preparacion, entregado, cancelado)"
+    }
+
+    LINEA_PEDIDO {
+        bigint       id PK
+        bigint       pedido_id FK
+        integer      numero_linea UK "UK (pedido_id, numero_linea)"
+        bigint       producto_id FK,UK "UK (pedido_id, producto_id)"
+        integer      cantidad "CHECK > 0"
+        numeric_12_2 precio_unitario "snapshot, CHECK >= 0"
+        numeric_5_2  descuento_porcentaje "snapshot, CHECK 0-100"
+    }
+
+    ENTREGA {
+        bigint id PK
+        text   codigo UK
+        bigint pedido_id FK
+        date   fecha_programada
+        date   fecha_efectiva "obligatoria si estado = entregada"
+        text   estado "planificada | en_transito | entregada | demorada | cancelada"
+    }
+
+    INCIDENCIA_OPERATIVA {
+        bigint id PK
+        text   codigo UK
+        bigint entrega_id FK
+        date   fecha
+        text   tipo "demora | faltante | dano | direccion_erronea | otro"
+        text   descripcion
+        text   estado "abierta | en_revision | cerrada"
+    }
+
+    DOCUMENTO {
+        bigint  id PK
+        text    codigo UK
+        text    titulo
+        bigint  clase_id FK
+        bigint  sensibilidad_id FK
+        text    procedencia
+        boolean activo
+    }
+
+    VERSION_DOCUMENTAL {
+        bigint      id PK
+        bigint      documento_id FK
+        integer     numero_version UK "UK (documento_id, numero_version)"
+        text        estado "borrador | publicada | sustituida | revocada"
+        timestamptz vigente_desde "NULL en borrador"
+        timestamptz vigente_hasta "nulo = sin fin"
+        timestamptz publicada_en
+        timestamptz revocada_en
+        text        ruta_relativa "archivo fuera de la base"
+        text        nombre_archivo
+        text        tipo_mime
+        bigint      tamano_bytes "CHECK > 0"
+        text        sha256 "CHECK ~ 64 hex"
+        jsonb       metadatos "acotado: no se filtra ni autoriza"
+    }
+
+    FRAGMENTO {
+        bigint  id PK
+        bigint  version_id FK
+        integer posicion UK "UK (version_id, posicion)"
+        text    titulo
+        text    contenido
+        integer pagina "opcional, CHECK > 0"
+    }
+
+    EMBEDDING {
+        bigint      id PK
+        bigint      fragmento_id FK,UK "UK (fragmento_id, modelo_id)"
+        bigint      modelo_id FK,UK
+        vector_32   vector "VECTOR(32), índice HNSW vector_cosine_ops"
+        timestamptz generado_en
+    }
+
+    DOCUMENTO_PRODUCTO {
+        bigint documento_id PK,FK
+        bigint producto_id PK,FK
+    }
+
+    DOCUMENTO_PROVEEDOR {
+        bigint documento_id PK,FK
+        bigint proveedor_id PK,FK
+    }
+
+    ACTOR {
+        bigint  id PK
+        text    codigo UK
+        text    nombre
+        bigint  perfil_autorizado_id FK,UK "UK (id, perfil_autorizado_id) habilita FK compuesta"
+        boolean activo
+    }
+
+    PERMISO_DOCUMENTAL {
+        bigint perfil_id PK,FK
+        bigint clase_id PK,FK
+    }
+
+    CONSULTA {
+        bigint      id PK
+        bigint      actor_id FK "FK compuesta (actor_id, perfil_efectivo_id) -> actor"
+        bigint      perfil_efectivo_id FK
+        text        pregunta
+        timestamptz instante
+    }
+
+    RESPUESTA {
+        bigint      id PK
+        bigint      consulta_id FK,UK "cero o una por consulta"
+        text        tipo_resultado "exito | sin_resultados | sin_fuente_autorizada | acceso_denegado"
+        text        contenido
+        timestamptz instante
+    }
+
+    RESULTADO_ESTRUCTURADO {
+        bigint      id PK
+        text        tipo_consulta "no admite SQL arbitrario"
+        jsonb       parametros
+        jsonb       contenido "snapshot inmutable"
+        timestamptz generado_en
+        text        hash "CHECK ~ 64 hex"
+    }
+
+    EVIDENCIA_DOCUMENTAL {
+        bigint       id PK
+        bigint       respuesta_id FK,UK "UK (respuesta_id, embedding_id) y (respuesta_id, ranking)"
+        bigint       embedding_id FK,UK
+        integer      ranking UK "CHECK > 0"
+        numeric_10_8 score
+    }
+
+    EVIDENCIA_ESTRUCTURADA {
+        bigint id PK
+        bigint respuesta_id FK,UK "UK (respuesta_id, resultado_estructurado_id)"
+        bigint resultado_estructurado_id FK,UK
+    }
+
+    EVENTO_AUDITORIA {
+        bigint      id PK
+        bigint      actor_id FK "NULL admitido: contexto inválido igual se audita"
+        bigint      perfil_efectivo_id FK
+        timestamptz instante
+        text        accion "9 valores fijos, ver CHECK"
+        text        resultado "permitido | denegado | rechazado"
+        text        recurso_tipo
+        bigint      recurso_id
+        bigint      consulta_id FK
+        bigint      respuesta_id FK
+        integer     ranking "CHECK > 0 si no es NULL"
+        numeric_10_8 score
+        jsonb       detalles "append-only: trigger bloquea UPDATE/DELETE"
+    }
+
+    CATEGORIA_PRODUCTO ||--o{ PRODUCTO : "categoria_id, RESTRICT"
+    SEGMENTO_CLIENTE   ||--o{ CLIENTE  : "segmento_id, RESTRICT"
+    PRODUCTO           ||--o{ PRODUCTO_PROVEEDOR : "producto_id, RESTRICT"
+    PROVEEDOR          ||--o{ PRODUCTO_PROVEEDOR : "proveedor_id, RESTRICT"
+    CLIENTE            ||--o{ CONDICION_COMERCIAL : "cliente_id, RESTRICT"
+    PRODUCTO           ||--o{ CONDICION_COMERCIAL : "producto_id, RESTRICT"
+    CLIENTE            ||--o{ PEDIDO : "cliente_id, RESTRICT"
+    PEDIDO             ||--|{ LINEA_PEDIDO : "pedido_id, RESTRICT"
+    PRODUCTO           ||--o{ LINEA_PEDIDO : "producto_id, RESTRICT"
+    PEDIDO             ||--o{ ENTREGA : "pedido_id, RESTRICT"
+    ENTREGA            ||--o{ INCIDENCIA_OPERATIVA : "entrega_id, RESTRICT"
+    CLASE_DOCUMENTAL   ||--o{ DOCUMENTO : "clase_id, RESTRICT"
+    NIVEL_SENSIBILIDAD ||--o{ DOCUMENTO : "sensibilidad_id, RESTRICT"
+    DOCUMENTO          ||--|{ VERSION_DOCUMENTAL : "documento_id, RESTRICT"
+    VERSION_DOCUMENTAL ||--|{ FRAGMENTO : "version_id, RESTRICT"
+    FRAGMENTO          ||--o{ EMBEDDING : "fragmento_id, RESTRICT"
+    MODELO_EMBEDDING   ||--o{ EMBEDDING : "modelo_id, RESTRICT"
+    DOCUMENTO          ||--o{ DOCUMENTO_PRODUCTO : "documento_id, RESTRICT"
+    PRODUCTO           ||--o{ DOCUMENTO_PRODUCTO : "producto_id, RESTRICT"
+    DOCUMENTO          ||--o{ DOCUMENTO_PROVEEDOR : "documento_id, RESTRICT"
+    PROVEEDOR          ||--o{ DOCUMENTO_PROVEEDOR : "proveedor_id, RESTRICT"
+    PERFIL_AUTORIZADO  ||--o{ ACTOR : "perfil_autorizado_id, RESTRICT"
+    PERFIL_AUTORIZADO  ||--o{ PERMISO_DOCUMENTAL : "perfil_id, RESTRICT"
+    CLASE_DOCUMENTAL   ||--o{ PERMISO_DOCUMENTAL : "clase_id, RESTRICT"
+    ACTOR              ||--o{ CONSULTA : "FK compuesta (actor_id, perfil_efectivo_id)"
+    CONSULTA           ||--o| RESPUESTA : "consulta_id, RESTRICT, UNIQUE"
+    RESPUESTA          ||--o{ EVIDENCIA_DOCUMENTAL : "respuesta_id, RESTRICT"
+    EMBEDDING          ||--o{ EVIDENCIA_DOCUMENTAL : "embedding_id, RESTRICT"
+    RESPUESTA          ||--o{ EVIDENCIA_ESTRUCTURADA : "respuesta_id, RESTRICT"
+    RESULTADO_ESTRUCTURADO ||--o{ EVIDENCIA_ESTRUCTURADA : "resultado_estructurado_id, RESTRICT"
+    ACTOR              |o--o{ EVENTO_AUDITORIA : "actor_id, RESTRICT, nulable"
+    PERFIL_AUTORIZADO  |o--o{ EVENTO_AUDITORIA : "perfil_efectivo_id, RESTRICT, nulable"
+    CONSULTA           |o--o{ EVENTO_AUDITORIA : "consulta_id, RESTRICT, nulable"
+    RESPUESTA          |o--o{ EVENTO_AUDITORIA : "respuesta_id, RESTRICT, nulable"
