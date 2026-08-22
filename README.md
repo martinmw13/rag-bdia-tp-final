@@ -48,29 +48,82 @@ La justificación frente a alternativas NoSQL y a bases vectoriales dedicadas se
 ```text
 ├── README.md
 ├── docs/
-│   ├── especificacion.md          # Especificación del producto
-│   ├── specs/                     # Especificaciones de implementación
-│   └── diagramas/                 # Fuentes Mermaid y diagramas renderizados
+│   ├── especificacion.md              # Especificación del producto
+│   ├── specs/                         # Especificaciones de implementación
+│   └── diagramas/                     # Fuentes Mermaid y diagramas renderizados
 ├── data/
-│   └── ejemplos/                  # Datos sintéticos y documentos generados
+│   └── ejemplos/
+│       ├── documentos/                # 14 archivos Markdown, uno por versión
+│       └── manifiesto.json            # Procedencia, conteos, checksums y oráculos
 ├── db/
-│   ├── estructura/                # DDL: tablas, claves y restricciones
-│   ├── datos/                     # Carga de datos de ejemplo
-│   ├── indices_vistas/            # Índices, vistas y controles de acceso
-│   └── consultas/                 # Consultas representativas
-├── nosql/
-│   └── modelo_nosql.md            # Análisis de alternativas NoSQL
-├── vectorial/
-│   └── modelo_vectorial.md        # Modelo de datos vectorial
-├── evidencias/                    # Resultados reproducibles y planes de ejecución
-├── scripts/                       # Generación de datos sintéticos
-└── anexos/
-    └── material_complementario.md
+│   ├── estructura/01_schema.sql       # Tablas, claves y restricciones
+│   ├── datos/02_seed.sql              # Carga de datos de ejemplo (generado)
+│   ├── indices_vistas/
+│   │   ├── 03_indices.sql             # Índices y vista de recuperación
+│   │   └── 05_seguridad.sql           # Roles, RLS y auditoría append-only
+│   └── consultas/
+│       ├── 04_consultas.sql           # Consultas 1 a 6
+│       └── 06_consultas_seguridad.sql # Consultas 7 a 9
+├── nosql/modelo_nosql.md              # Análisis de alternativas NoSQL
+├── vectorial/modelo_vectorial.md      # Modelo de datos vectorial
+├── evidencias/
+│   ├── planes_ejecucion.md            # Planes reales y su interpretación
+│   └── seguridad/                     # Matriz de autorización y pruebas negativas
+├── scripts/
+│   ├── generar_datos.py               # Generador del conjunto sintético
+│   └── cargar_base.sh                 # Recreación completa de la base
+└── anexos/material_complementario.md
 ```
+
+Los archivos SQL están numerados por orden de ejecución, que atraviesa las
+carpetas: `01` y `02` construyen y pueblan, `03` agrega estructuras de acceso,
+`04` consulta, `05` aplica el control de acceso y `06` lo verifica.
 
 ## Instrucciones para ejecutar la implementación mínima
 
-> **Pendiente.** Se completa cuando exista la implementación.
+### Requisitos previos
+
+- PostgreSQL 15 o superior con la extensión [`pgvector`](https://github.com/pgvector/pgvector) disponible, y `psql` en el `PATH`.
+- Python 3 para el generador de datos, que usa **sólo biblioteca estándar**: no hay que instalar dependencias ni crear un entorno virtual.
+
+La implementación se desarrolló y verificó sobre PostgreSQL 17.11 con pgvector
+0.8.6.
+
+### Ejecución completa
+
+```bash
+scripts/cargar_base.sh
+```
+
+El script regenera el conjunto sintético, recrea la base `rag_distribuidora`
+desde cero, aplica los cinco archivos SQL en orden y ejecuta las nueve
+consultas. Acepta otro nombre de base como primer argumento.
+
+> La base indicada **se elimina y se vuelve a crear**. No apuntar a una base con
+> datos que interesen.
+
+### Paso a paso
+
+```bash
+python3 scripts/generar_datos.py          # documentos, manifiesto y 02_seed.sql
+createdb rag_distribuidora
+psql -d rag_distribuidora -f db/estructura/01_schema.sql
+psql -d rag_distribuidora -f db/datos/02_seed.sql
+psql -d rag_distribuidora -f db/indices_vistas/03_indices.sql
+psql -d rag_distribuidora -f db/indices_vistas/05_seguridad.sql
+```
+
+Las consultas 6 y 7 reciben el vector de consulta como parámetro. Su fuente de
+autoridad es `data/ejemplos/manifiesto.json`, en `oraculos_vectoriales`; el
+script de carga lo lee de ahí automáticamente.
+
+### Reproducibilidad
+
+El generador usa semilla `42` y el instante de referencia
+`2026-06-30T15:00:00Z`. Nada depende de la hora de ejecución ni del estado
+previo de la base, así que dos ejecuciones limpias producen los mismos
+identificadores, archivos y checksums. La carga es idempotente: `02_seed.sql`
+vacía las tablas antes de insertar.
 
 ## Principales decisiones de diseño
 
@@ -78,6 +131,8 @@ La justificación frente a alternativas NoSQL y a bases vectoriales dedicadas se
 - **Sólo se vectorizan los fragmentos documentales.** Los hechos operativos se consultan como datos estructurados.
 - **La autorización y la vigencia limitan el universo antes del ranking**, no después: un resultado prohibido nunca ocupa un lugar en el top-k.
 - **Permisos por perfil y clase documental**, con denegación por defecto y sin excepciones individuales. El control de acceso no depende del texto de la consulta.
+- **Los perfiles funcionales no son roles de base de datos.** Son datos, y el permiso surge de una tabla. Los roles de base separan responsabilidades técnicas —ingesta, responsable documental, runtime de consulta y revisor de auditoría— y el runtime asume la identidad del actor por transacción, como una aplicación con pool de conexiones: la conexión es compartida, la identidad no.
+- **El aislamiento se apoya en RLS, no en las consultas.** Las políticas se aplican sobre las tablas, no sobre una vista, de modo que el filtro siga vigente aunque alguien consulte las tablas directamente. La vista de recuperación usa `security_invoker` para no convertirse en un camino que las eluda.
 - **Historial completo**: las versiones sustituidas o revocadas se conservan pero dejan de recuperarse, de modo que una respuesta anterior siga siendo explicable.
 - **Evidencia obligatoria**: toda respuesta exitosa conserva la fuente exacta que utilizó; los resultados negativos se declaran explícitamente y no inventan evidencia.
 - **Auditoría append-only**, que registra la actividad sin duplicar contenido sensible.
@@ -86,11 +141,63 @@ La justificación frente a alternativas NoSQL y a bases vectoriales dedicadas se
 
 ## Consultas incluidas
 
-> **Pendiente.** Se completa cuando existan las consultas.
+Nueve consultas, con su propósito, parámetros y resultado esperado declarados
+en el propio archivo SQL. Los resultados se expresan en códigos de negocio, no
+en claves internas, para que sobrevivan a una recarga.
+
+| # | Consulta | Patrón que demuestra |
+| --- | --- | --- |
+| 1 | Condición comercial vigente | Selección y filtrado sobre un intervalo semiabierto |
+| 2 | Pedidos y entregas que requieren atención | `JOIN` entre cuatro entidades y `LEFT JOIN` |
+| 3 | Importe neto por categoría | Agregación con `GROUP BY` |
+| 4 | Productos principales por segmento | Función de ventana `DENSE_RANK` |
+| 5 | Clientes sin pedidos históricos | Subconsulta correlacionada con `NOT EXISTS` |
+| 6 | Búsqueda vectorial top-k | Distancia coseno con orden estable |
+| 7 | Recuperación híbrida autorizada | Similitud combinada con filtros relacionales |
+| 8 | Matriz de autorización | Verificación exhaustiva del control de acceso |
+| 9 | Trazabilidad e inmutabilidad | Auditoría y correlación histórica |
+
+Las consultas 1 a 6 están en `db/consultas/04_consultas.sql`. Las 7, 8 y 9
+están en `db/consultas/06_consultas_seguridad.sql` porque sólo tienen sentido
+con los roles y las políticas de RLS aplicados: se ejecutan con el rol
+`rag_runtime`, que no es propietario ni tiene `BYPASSRLS`.
+
+El resultado más ilustrativo es el de la consulta 7. Con el mismo vector y el
+mismo corpus, Comercial/Compras recibe primero la política comercial buscada,
+mientras que Operaciones/Logística no recibe **ningún** fragmento de esa clase,
+ni siquiera en la última posición del top-5: la autorización limita el universo
+antes de calcular el orden, así que un fragmento prohibido nunca llega a ocupar
+un lugar. Las salidas están en
+[`evidencias/seguridad/matriz_autorizacion.md`](evidencias/seguridad/matriz_autorizacion.md).
 
 ## Limitaciones y posibles mejoras
 
-> **Pendiente.** Se completa al cierre del trabajo.
+Límites asumidos de forma deliberada, por tratarse de una prueba funcional de
+diseño y no de un sistema en producción:
+
+- **Los embeddings son sintéticos.** Son vectores de 32 dimensiones construidos
+  con centroides y ruido determinista, no la salida de un modelo real. Permiten
+  demostrar el almacenamiento, el índice, la métrica y el filtrado autorizado,
+  pero no la calidad semántica de la recuperación.
+- **La escala es mínima.** Ninguna tabla supera las 56 filas, así que el
+  planificador resuelve casi todo con `Seq Scan` incluso habiendo índices. Los
+  tiempos medidos no deben extrapolarse: ver
+  [`evidencias/planes_ejecucion.md`](evidencias/planes_ejecucion.md).
+- **No hay autenticación.** Los actores no guardan credenciales y los roles se
+  crean `NOLOGIN`; las pruebas usan `SET ROLE`. Cómo se autentica un usuario y
+  cómo se propaga su identidad hasta el contexto de la transacción queda fuera
+  de alcance.
+- **No hay integración con un modelo de lenguaje.** El copiloto es el contexto
+  del problema; lo que se diseña es la capa de datos que lo sostendría.
+- **La arquitectura es un núcleo único.** Separación del almacenamiento de
+  archivos, réplicas de lectura y particionamiento temporal se analizan como
+  evolución, pero no se implementan.
+
+Mejoras naturales si el trabajo continuara: reemplazar los vectores sintéticos
+por un modelo real y revisar la dimensión y los parámetros del índice HNSW;
+mover los archivos originales a almacenamiento de objetos conservando el
+contrato de checksum; y particionar `evento_auditoria` por tiempo, que es la
+tabla de crecimiento continuo más claro.
 
 ## Documentación
 
