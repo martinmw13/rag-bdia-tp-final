@@ -10,5 +10,11 @@ wheels/
 .venv
 practica/
 
+# IDE
+/.idea/
+
 # Local agent guidance (not part of the academic deliverables)
 /AGENTS.md
+/CLAUDE.md
+/CLAUDE.local.md
+/.claude/
