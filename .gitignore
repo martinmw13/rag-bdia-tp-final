@@ -9,3 +9,6 @@ wheels/
 # Virtual environments
 .venv
 practica/
+
+# Local agent guidance (not part of the academic deliverables)
+/AGENTS.md
