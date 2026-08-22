@@ -1,0 +1,267 @@
+{
+  "archivos": [
+    {
+      "ruta": "data/ejemplos/documentos/DOC-001-v1.md",
+      "sha256": "51556f61a9475f622acf2349f6e693b4e1745e9365a7deb6daebfb7e4dc82b13",
+      "tamano_bytes": 385
+    },
+    {
+      "ruta": "data/ejemplos/documentos/DOC-002-v1.md",
+      "sha256": "cfd41d87baae7356fcf539d22ae8784f17b7d020c86f089c9c99473299866332",
+      "tamano_bytes": 383
+    },
+    {
+      "ruta": "data/ejemplos/documentos/DOC-002-v2.md",
+      "sha256": "64940bd633c15b88f43a0edd9b8f8584fb892eae3464f38763c9c06608eb18c8",
+      "tamano_bytes": 532
+    },
+    {
+      "ruta": "data/ejemplos/documentos/DOC-003-v1.md",
+      "sha256": "ad5d901b8b37fdc6753a0430b673fe5fac3ebc495476b1259d813d0c8707070f",
+      "tamano_bytes": 378
+    },
+    {
+      "ruta": "data/ejemplos/documentos/DOC-003-v2.md",
+      "sha256": "36f6132b38d7eb7f50826261b9fe5c49389f0baeb6571f6580443fcc466593fe",
+      "tamano_bytes": 644
+    },
+    {
+      "ruta": "data/ejemplos/documentos/DOC-004-v1.md",
+      "sha256": "20fc49451562b4e3f36541a38f75202b68c432db5c6ad4971370e2cb91342275",
+      "tamano_bytes": 381
+    },
+    {
+      "ruta": "data/ejemplos/documentos/DOC-005-v1.md",
+      "sha256": "30c633a74d4fc87b465e6e46d0906f27d2a915e1be308e1a1bd2eb128818fbe1",
+      "tamano_bytes": 348
+    },
+    {
+      "ruta": "data/ejemplos/documentos/DOC-005-v2.md",
+      "sha256": "3bb40dc3d3bf97cdc7a4d395261373d5de74f2add64a0c6aac38038eb5ee5cb8",
+      "tamano_bytes": 488
+    },
+    {
+      "ruta": "data/ejemplos/documentos/DOC-006-v1.md",
+      "sha256": "8e139c92e570ec4377313682fc652ba79aef68c19e8f7a00e830fc4803d5bbca",
+      "tamano_bytes": 340
+    },
+    {
+      "ruta": "data/ejemplos/documentos/DOC-007-v1.md",
+      "sha256": "18b6aa9498ede25063f8b0a6575a6c9b74628bb3ebd666d71903d9c699b5c703",
+      "tamano_bytes": 333
+    },
+    {
+      "ruta": "data/ejemplos/documentos/DOC-008-v1.md",
+      "sha256": "f7a10af6c7abd77c6823360f1eb38793f82763b3b1930dac3065823558f3c9d3",
+      "tamano_bytes": 325
+    },
+    {
+      "ruta": "data/ejemplos/documentos/DOC-009-v1.md",
+      "sha256": "46e396d54e986e0fcd018d9503fdef7b25df4b1480079fce6aa75448612890aa",
+      "tamano_bytes": 333
+    },
+    {
+      "ruta": "data/ejemplos/documentos/DOC-009-v2.md",
+      "sha256": "c72ed4cd41fd712c796705b8d0ea5b8f943ee340d4c787db6b41445947936cd3",
+      "tamano_bytes": 333
+    },
+    {
+      "ruta": "data/ejemplos/documentos/DOC-010-v1.md",
+      "sha256": "98fc437ea4372e091cc5629e2b1c24b40a345d4844d8b9a1f9ddd3ce45c78f48",
+      "tamano_bytes": 386
+    }
+  ],
+  "checksums": {
+    "db/datos/02_seed.sql": "bf8c60d2d95093f4c32087847641354fc080434c52bb058110f82a7275434462"
+  },
+  "conteos": {
+    "actor": 6,
+    "categoria_producto": 4,
+    "clase_documental": 5,
+    "cliente": 6,
+    "condicion_comercial": 12,
+    "consulta": 7,
+    "documento": 10,
+    "embedding": 36,
+    "entrega": 14,
+    "evento_auditoria": 56,
+    "evidencia_documental": 3,
+    "evidencia_estructurada": 5,
+    "fragmento": 32,
+    "incidencia_operativa": 4,
+    "linea_pedido": 28,
+    "modelo_embedding": 2,
+    "nivel_sensibilidad": 3,
+    "pedido": 12,
+    "perfil_autorizado": 3,
+    "permiso_documental": 8,
+    "producto": 12,
+    "producto_proveedor": 18,
+    "proveedor": 4,
+    "respuesta": 7,
+    "resultado_estructurado": 5,
+    "segmento_cliente": 3,
+    "version_documental": 14
+  },
+  "escenarios": [
+    {
+      "actor": "ACT-003",
+      "con_evidencia": true,
+      "id": "ESC-01",
+      "perfil": "COM",
+      "pregunta": "¿Qué condición comercial se aplica hoy al taladro percutor para el Corralón del Norte?",
+      "tipo_resultado": "exito"
+    },
+    {
+      "actor": "ACT-001",
+      "con_evidencia": true,
+      "id": "ESC-02",
+      "perfil": "OPS",
+      "pregunta": "¿Qué pedidos y entregas requieren atención esta semana?",
+      "tipo_resultado": "exito"
+    },
+    {
+      "actor": "ACT-003",
+      "con_evidencia": true,
+      "id": "ESC-03",
+      "perfil": "COM",
+      "pregunta": "¿Cuál es el importe neto facturado por categoría de producto?",
+      "tipo_resultado": "exito"
+    },
+    {
+      "actor": "ACT-003",
+      "con_evidencia": true,
+      "id": "ESC-04",
+      "perfil": "COM",
+      "pregunta": "¿Cuáles son los productos principales de cada segmento de cliente?",
+      "tipo_resultado": "exito"
+    },
+    {
+      "actor": "ACT-003",
+      "con_evidencia": true,
+      "id": "ESC-05",
+      "perfil": "COM",
+      "pregunta": "¿Qué clientes no registran pedidos históricos?",
+      "tipo_resultado": "exito"
+    },
+    {
+      "actor": "ACT-001",
+      "con_evidencia": true,
+      "id": "ESC-06",
+      "perfil": "OPS",
+      "pregunta": "¿Cómo debo proceder ante una entrega demorada?",
+      "tipo_resultado": "exito"
+    },
+    {
+      "actor": "ACT-001",
+      "con_evidencia": false,
+      "id": "ESC-07",
+      "perfil": "OPS",
+      "pregunta": "¿Qué descuentos por volumen puedo ofrecer a un cliente mayorista?",
+      "tipo_resultado": "sin_fuente_autorizada"
+    }
+  ],
+  "instante_referencia": "2026-06-30T15:00:00Z",
+  "matriz_permisos": {
+    "ADM": [
+      "CUMP",
+      "FICHA",
+      "LEGAL",
+      "PROC"
+    ],
+    "COM": [
+      "FICHA",
+      "POL"
+    ],
+    "OPS": [
+      "FICHA",
+      "PROC"
+    ]
+  },
+  "modelo_vectorial": {
+    "dimension": 32,
+    "metrica": "coseno",
+    "modelo_activo": "distribuidora-emb v2",
+    "modelo_historico": "distribuidora-emb v1"
+  },
+  "oraculos_vectoriales": {
+    "consulta_hibrida": {
+      "documento_esperado_comercial": "DOC-005",
+      "fragmento_esperado_comercial": 18,
+      "vector": [
+        0.02872367,
+        0.01025648,
+        0.40725214,
+        -0.04822106,
+        0.07495632,
+        0.09278553,
+        -0.05902754,
+        0.33592943,
+        0.05998166,
+        0.02448346,
+        0.01487848,
+        0.05369085,
+        0.42346254,
+        -0.03593506,
+        0.09472953,
+        0.0012242,
+        0.0278831,
+        0.36409134,
+        0.01477823,
+        -0.04687114,
+        0.09674737,
+        -0.08000598,
+        0.43716464,
+        0.04561958,
+        -0.03006298,
+        -0.05777442,
+        -0.0361706,
+        0.38442162,
+        -0.03345611,
+        0.0054786,
+        0.06462671,
+        -0.00866835
+      ]
+    },
+    "consulta_vectorial": {
+      "documento_esperado": "DOC-003",
+      "fragmento_esperado": 10,
+      "vector": [
+        0.02407044,
+        0.39048768,
+        -0.00589328,
+        0.08588869,
+        0.08461471,
+        0.07751461,
+        0.38751057,
+        -0.02720222,
+        0.05677657,
+        0.03302611,
+        -0.04353289,
+        0.41282218,
+        -0.0226062,
+        -0.01254818,
+        0.05356524,
+        -0.04924025,
+        0.22161271,
+        0.10674079,
+        0.04280277,
+        0.06535128,
+        -0.00759252,
+        0.4264947,
+        0.05935904,
+        0.06767404,
+        -0.02841572,
+        -0.02921892,
+        0.26204522,
+        0.0797989,
+        0.08663929,
+        0.10032601,
+        0.10588104,
+        0.36154583
+      ]
+    }
+  },
+  "semilla": 42,
+  "version_generador": "1.0.0"
+}
