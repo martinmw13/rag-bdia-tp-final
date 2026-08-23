@@ -18,7 +18,7 @@ de dónde documentar cada punto; hasta entonces indica la sección propuesta.
 | Consultas sobre productos, condiciones comerciales, pedidos, entregas, incidencias, procedimientos y documentación de proveedores/cumplimiento | [`db/consultas/04_consultas.sql`](../db/consultas/04_consultas.sql) (1–6), [`06_consultas_seguridad.sql`](../db/consultas/06_consultas_seguridad.sql) (7) | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) | Alcance funcional y consultas representativas |
 | Cada respuesta exitosa conserva evidencia documental o estructurada identificable | `evidencia_documental`, `evidencia_estructurada` en [`01_schema.sql`](../db/estructura/01_schema.sql) | [`docs/specs/.../impl-seguridad-recuperacion.md`](specs/capa-datos-rag-distribuidora/impl-seguridad-recuperacion.md) §"Evidencia y resultados" | Modelo de interacción y evidencia |
 | Resultado negativo explícito sin evidencia inventada | `respuesta.tipo_resultado CHECK IN (...)` | [`evidencias/seguridad/matriz_autorizacion.md`](../evidencias/seguridad/matriz_autorizacion.md) §"Contextos inválidos" | Resultados negativos y evidencia |
-| Historial suficiente para explicar respuestas anteriores | `version_documental` (estados `sustituida`/`revocada` no se borran) | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) | Vigencia e historial documental |
+| Historial suficiente para explicar respuestas anteriores | `version_documental` (estados `sustituida`/`revocada` no se borran) | [`docs/diagramas/fisico_notas.md`](diagramas/fisico_notas.md) | Vigencia e historial documental |
 
 ## Información y procedencia
 
@@ -33,7 +33,7 @@ de dónde documentar cada punto; hasta entonces indica la sección propuesta.
 
 | Requisito | Artefacto | Evidencia | Sección del informe (propuesta) |
 | --- | --- | --- | --- |
-| Sólo una versión publicada, no revocada y vigente es recuperable por documento | `version_documental_sin_solape_ex` (EXCLUDE parcial), vista `fragmento_recuperable` | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) | Vigencia documental |
+| Sólo una versión publicada, no revocada y vigente es recuperable por documento | `version_documental_sin_solape_ex` (EXCLUDE parcial), vista `fragmento_recuperable` | [`docs/diagramas/fisico_notas.md`](diagramas/fisico_notas.md) | Vigencia documental |
 | Publicar sustituye a la anterior sin ventana de inconsistencia | [`docs/specs/.../impl-modelo-datos.md`](specs/capa-datos-rag-distribuidora/impl-modelo-datos.md) §"Integridad e invariantes transaccionales" | — (a demostrar con transacción en el informe) | Publicación y sustitución atómica |
 | Permisos por perfil y clase documental, denegación por defecto, sin excepciones individuales | `permiso_documental`, políticas RLS en [`05_seguridad.sql`](../db/indices_vistas/05_seguridad.sql) | [`evidencias/seguridad/matriz_autorizacion.md`](../evidencias/seguridad/matriz_autorizacion.md) | Matriz de autorización |
 | Vigencia y autorización limitan el universo antes del ranking vectorial | `fragmento_recuperable` + RLS sobre tablas base (no sobre la vista) | Consulta 7 en [`06_consultas_seguridad.sql`](../db/consultas/06_consultas_seguridad.sql) | Recuperación híbrida autorizada |
@@ -62,7 +62,7 @@ de dónde documentar cada punto; hasta entonces indica la sección propuesta.
 | --- | --- | --- | --- |
 | Diagramas regenerables desde fuentes textuales versionadas | [`docs/diagramas/*.mmd`](diagramas/) | [`docs/diagramas/README.md`](diagramas/README.md) (instrucciones de render) | Modelo de datos |
 | Evidencias revisables sin repetir explicaciones del informe | [`evidencias/`](../evidencias/) | — | Evidencias (anexo) |
-| Recuperación con desempate estable | Orden `distancia, fragmento_id` en consultas 6–7 | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) | Recuperación vectorial |
+| Recuperación con desempate estable | Orden `distancia, fragmento_id` en consultas 6–7 | [`db/consultas/04_consultas.sql`](../db/consultas/04_consultas.sql) §resultados esperados | Recuperación vectorial |
 | Decisiones de rendimiento basadas en planes observados, no en optimizaciones anticipadas | Comentarios de justificación en [`03_indices.sql`](../db/indices_vistas/03_indices.sql) | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) | Rendimiento y escalabilidad |
 
 ## Requisitos opcionales
@@ -80,7 +80,7 @@ de dónde documentar cada punto; hasta entonces indica la sección propuesta.
 | Un actor pertenece a un único perfil; la consulta conserva el perfil efectivo | FK compuesta `consulta (actor_id, perfil_efectivo_id) → actor (id, perfil_autorizado_id)` | [`fisico_notas.md`](diagramas/fisico_notas.md) §"Claves foráneas compuestas" |
 | Ausencia de permiso perfil-clase implica denegación | `permiso_documental` sin fila = sin acceso; RLS lo aplica | [`evidencias/seguridad/matriz_autorizacion.md`](../evidencias/seguridad/matriz_autorizacion.md) |
 | Estados documentales: borrador, publicada, sustituida, revocada | `version_documental.estado CHECK` | [`01_schema.sql`](../db/estructura/01_schema.sql) |
-| Versiones sustituidas o revocadas se conservan pero no son recuperables | Exclusión parcial `WHERE estado = 'publicada'` + vista `fragmento_recuperable` | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) |
+| Versiones sustituidas o revocadas se conservan pero no son recuperables | Exclusión parcial `WHERE estado = 'publicada'` + vista `fragmento_recuperable` | [`docs/diagramas/fisico_notas.md`](diagramas/fisico_notas.md) |
 | Pedido con cliente y al menos una línea; producto no repetido en el pedido | `linea_pedido_producto_uk`; validación atómica de "al menos una línea" en la carga | [`02_seed.sql`](../db/datos/02_seed.sql) |
 | Entrega pertenece a un pedido; entregas parciales admitidas | `entrega.pedido_id`, sin restricción de cardinalidad máxima | [`01_schema.sql`](../db/estructura/01_schema.sql) |
 | Incidencia pertenece a una entrega, nunca directamente a un pedido | `incidencia_operativa.entrega_id NOT NULL` | [`01_schema.sql`](../db/estructura/01_schema.sql) |
@@ -106,7 +106,7 @@ de dónde documentar cada punto; hasta entonces indica la sección propuesta.
 | Métrica | Cómo se verifica | Evidencia |
 | --- | --- | --- |
 | 100% de escenarios de carga y validación con conteos/checksums esperados | Comparar contra `manifiesto.json` tras `cargar_base.sh` | [`data/ejemplos/manifiesto.json`](../data/ejemplos/manifiesto.json) |
-| Las nueve consultas devuelven códigos, valores, conteos y orden deterministas | Ejecutar `04_consultas.sql` y `06_consultas_seguridad.sql` | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) |
+| Las nueve consultas devuelven códigos, valores, conteos y orden deterministas | Ejecutar `04_consultas.sql` y `06_consultas_seguridad.sql` | [`db/consultas/04_consultas.sql`](../db/consultas/04_consultas.sql) §resultados esperados |
 | Las quince combinaciones perfil-clase respetan la matriz acordada | Consulta 8 con `rag_runtime` sin `BYPASSRLS` | [`evidencias/seguridad/matriz_autorizacion.md`](../evidencias/seguridad/matriz_autorizacion.md) |
 | Ninguna búsqueda devuelve contenido fuera del universo autorizado o vigente | Consulta 7 (cero filas fuera del universo permitido) | [`evidencias/seguridad/matriz_autorizacion.md`](../evidencias/seguridad/matriz_autorizacion.md) |
 | Toda respuesta exitosa reconstruible hasta su fuente; negativos sin evidencia ficticia | Consulta 9 (trazabilidad) | [`06_consultas_seguridad.sql`](../db/consultas/06_consultas_seguridad.sql) |
@@ -129,7 +129,8 @@ de dónde documentar cada punto; hasta entonces indica la sección propuesta.
 | Roles, permisos, aislamiento y auditoría | [`05_seguridad.sql`](../db/indices_vistas/05_seguridad.sql), [`evidencias/seguridad/`](../evidencias/seguridad/) | Trasladar al informe |
 | Rendimiento, escalabilidad y conclusiones | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) | Redactar conclusiones en el informe |
 
-**Pendientes de esta matriz que quedan fuera de este trabajo:**
-[`docs/informe_latex/`](informe_latex/) (no existe aún) y los renders
-SVG/PNG de `docs/diagramas/` (fuentes `.mmd` listas, ver
-[`diagramas/README.md`](diagramas/README.md) para generarlos).
+**Pendiente de esta matriz:** el informe (`docs/informe_latex/`), que todavía
+no existe. Los renders de los diagramas ya están publicados en `docs/` con los
+nombres que enumera la consigna; sus fuentes `.mmd` siguen siendo la autoridad
+y se regeneran con el procedimiento de
+[`diagramas/README.md`](diagramas/README.md).

@@ -19,9 +19,9 @@ flowchart TD
         GEN --> MANI
     end
 
-    CARGA["scripts/cargar_base.sh<br/>recrea la base y aplica 01→05 en orden"]
+    CARGA["scripts/cargar_base.sh<br/>recrea la base, aplica 01→05 y ejecuta las consultas"]
     GEN --> CARGA
-    DOCS -. "ruta relativa + SHA-256, el archivo permanece fuera" .-> VD
+    DOCS -. "ruta relativa + SHA-256" .-> VD
 
     subgraph PG["PostgreSQL 17 · extensiones vector + btree_gist (instancia única)"]
         direction TB
@@ -79,8 +79,8 @@ flowchart TD
     end
 
     R_ING -->|INSERT borrador| DOC
-    R_ING -->|INSERT| FRAG
-    R_ING -->|INSERT| EMB
+    R_ING -->|"INSERT fragmento"| FRAG
+    R_ING -->|"INSERT embedding"| EMB
     R_DOC -->|"UPDATE ciclo de vida"| VD
     R_RUN -->|"SELECT vía RLS"| VISTA
     R_RUN -->|"INSERT"| CONS

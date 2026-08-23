@@ -50,7 +50,12 @@ La justificación frente a alternativas NoSQL y a bases vectoriales dedicadas se
 ├── docs/
 │   ├── especificacion.md              # Especificación del producto
 │   ├── specs/                         # Especificaciones de implementación
-│   └── diagramas/                     # Fuentes Mermaid y diagramas renderizados
+│   ├── matriz_cobertura.md            # Requisito → artefacto → evidencia
+│   ├── modelo_conceptual.png          # Diagramas renderizados
+│   ├── modelo_logico_o_equivalente.png
+│   ├── modelo_fisico_o_equivalente.png
+│   ├── arquitectura.png
+│   └── diagramas/                     # Fuentes Mermaid (autoridad de los diagramas)
 ├── data/
 │   └── ejemplos/
 │       ├── documentos/                # 14 archivos Markdown, uno por versión
@@ -203,7 +208,7 @@ tabla de crecimiento continuo más claro.
 
 - [Especificación del producto](docs/especificacion.md)
 - [Especificaciones de implementación](docs/specs/capa-datos-rag-distribuidora/)
-- [Diagramas conceptual, lógico, físico y de arquitectura](docs/diagramas/)
+- Diagramas: [conceptual](docs/modelo_conceptual.png), [lógico](docs/modelo_logico_o_equivalente.png), [físico](docs/modelo_fisico_o_equivalente.png) y [arquitectura](docs/arquitectura.png) — [fuentes Mermaid](docs/diagramas/)
 - [Matriz de cobertura](docs/matriz_cobertura.md)
 - [Análisis de alternativas NoSQL](nosql/modelo_nosql.md)
 - [Modelo de datos vectorial](vectorial/modelo_vectorial.md)
