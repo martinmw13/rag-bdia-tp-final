@@ -6,6 +6,17 @@ lógico, físico y de arquitectura. Los `.mmd` son la autoridad; cualquier
 render (SVG/PNG) que se incluya en el informe se regenera a partir de ellos,
 nunca se edita a mano.
 
+Los renders publicados viven un nivel más arriba, en `docs/`, con los nombres
+que enumera la consigna, de modo que quien corrige los encuentre donde los
+busca:
+
+| Fuente | Render publicado |
+| --- | --- |
+| `conceptual.mmd` | [`docs/modelo_conceptual.png`](../modelo_conceptual.png) |
+| `logico.mmd` | [`docs/modelo_logico_o_equivalente.png`](../modelo_logico_o_equivalente.png) |
+| `fisico.mmd` | [`docs/modelo_fisico_o_equivalente.png`](../modelo_fisico_o_equivalente.png) |
+| `arquitectura.mmd` | [`docs/arquitectura.png`](../arquitectura.png) |
+
 | Archivo | Contenido | Nivel |
 | --- | --- | --- |
 | [`conceptual.mmd`](conceptual.mmd) | Entidades y relaciones de negocio, sin atributos ni tipos. | Conceptual |
@@ -24,10 +35,19 @@ dependencias fuera de la biblioteca estándar de Python): es una herramienta
 de documentación que se ejecuta una vez para generar las imágenes.
 
 ```bash
-npx -y @mermaid-js/mermaid-cli -i docs/diagramas/conceptual.mmd   -o docs/diagramas/conceptual.svg
-npx -y @mermaid-js/mermaid-cli -i docs/diagramas/logico.mmd       -o docs/diagramas/logico.svg
-npx -y @mermaid-js/mermaid-cli -i docs/diagramas/fisico.mmd       -o docs/diagramas/fisico.svg
-npx -y @mermaid-js/mermaid-cli -i docs/diagramas/arquitectura.mmd -o docs/diagramas/arquitectura.svg
+npx -y @mermaid-js/mermaid-cli -i docs/diagramas/conceptual.mmd   -o docs/modelo_conceptual.png
+npx -y @mermaid-js/mermaid-cli -i docs/diagramas/logico.mmd       -o docs/modelo_logico_o_equivalente.png
+npx -y @mermaid-js/mermaid-cli -i docs/diagramas/fisico.mmd       -o docs/modelo_fisico_o_equivalente.png
+npx -y @mermaid-js/mermaid-cli -i docs/diagramas/arquitectura.mmd -o docs/arquitectura.png
+```
+
+Los renders publicados están a 2400 px de ancho. Es suficiente para leer cada
+etiqueta y mantiene los cuatro archivos en unos 2 MB en total; a la resolución
+por defecto de la herramienta ocupaban más del triple sin ganar legibilidad.
+Para reducirlos después de generarlos, en macOS alcanza con:
+
+```bash
+sips -Z 2400 docs/modelo_conceptual.png
 ```
 
 La primera ejecución descarga Chromium vía Puppeteer. Alternativa sin
