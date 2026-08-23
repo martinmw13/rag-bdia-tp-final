@@ -35,20 +35,26 @@ dependencias fuera de la biblioteca estándar de Python): es una herramienta
 de documentación que se ejecuta una vez para generar las imágenes.
 
 ```bash
-npx -y @mermaid-js/mermaid-cli -i docs/diagramas/conceptual.mmd   -o docs/modelo_conceptual.png
-npx -y @mermaid-js/mermaid-cli -i docs/diagramas/logico.mmd       -o docs/modelo_logico_o_equivalente.png
-npx -y @mermaid-js/mermaid-cli -i docs/diagramas/fisico.mmd       -o docs/modelo_fisico_o_equivalente.png
-npx -y @mermaid-js/mermaid-cli -i docs/diagramas/arquitectura.mmd -o docs/arquitectura.png
+MMD="npx -y @mermaid-js/mermaid-cli -t neutral -b white"
+
+$MMD -i docs/diagramas/conceptual.mmd   -o docs/modelo_conceptual.png          -w 3000
+$MMD -i docs/diagramas/logico.mmd       -o docs/modelo_logico_o_equivalente.png -w 3000
+$MMD -i docs/diagramas/fisico.mmd       -o docs/modelo_fisico_o_equivalente.png -w 3000
+$MMD -i docs/diagramas/arquitectura.mmd -o docs/arquitectura.png                -w 3600
 ```
 
-Los renders publicados están a 2400 px de ancho. Es suficiente para leer cada
-etiqueta y mantiene los cuatro archivos en unos 2 MB en total; a la resolución
-por defecto de la herramienta ocupaban más del triple sin ganar legibilidad.
-Para reducirlos después de generarlos, en macOS alcanza con:
+Las opciones no son decorativas y conviene respetarlas para que los cuatro
+diagramas sigan siendo un conjunto coherente:
 
-```bash
-sips -Z 2400 docs/modelo_conceptual.png
-```
+- `-t neutral -b white` fija el mismo tema y fondo en los cuatro. Sin esto, el
+  tema por defecto colorea los subgrafos y el de arquitectura deja de
+  parecerse a los tres modelos ER.
+- `-w` controla el ancho. A menos de 3000 px las etiquetas de las aristas del
+  diagrama de arquitectura empiezan a superponerse; por eso ese usa 3600.
+
+Con estos valores los cuatro archivos suman alrededor de 1,2 MB, entre 2500 y
+3100 px de ancho según cuánto ocupe cada diagrama. La resolución por defecto de
+la herramienta producía archivos seis veces más pesados sin ganar legibilidad.
 
 La primera ejecución descarga Chromium vía Puppeteer. Alternativa sin
 instalar nada localmente: pegar el contenido de cada `.mmd` en
