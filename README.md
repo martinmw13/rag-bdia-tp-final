@@ -203,3 +203,7 @@ tabla de crecimiento continuo más claro.
 
 - [Especificación del producto](docs/especificacion.md)
 - [Especificaciones de implementación](docs/specs/capa-datos-rag-distribuidora/)
+- [Diagramas conceptual, lógico, físico y de arquitectura](docs/diagramas/)
+- [Matriz de cobertura](docs/matriz_cobertura.md)
+- [Análisis de alternativas NoSQL](nosql/modelo_nosql.md)
+- [Modelo de datos vectorial](vectorial/modelo_vectorial.md)

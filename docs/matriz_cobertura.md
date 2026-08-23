@@ -1,0 +1,135 @@
+# Matriz de cobertura
+
+Vincula cada requisito de [`especificacion.md`](especificacion.md) con el
+artefacto que lo implementa y la evidencia que lo demuestra. Es un índice, no
+una segunda narrativa: no repite explicaciones que ya están en la
+especificación, las specs de implementación o el informe. Cuando el informe
+en LaTeX se escriba, la columna "Sección del informe" debe usarse como guía
+de dónde documentar cada punto; hasta entonces indica la sección propuesta.
+
+> Estado al momento de esta versión: el informe en LaTeX (`docs/informe_latex/`)
+> todavía no existe. Las secciones de esta columna son la propuesta de
+> organización, no enlaces activos.
+
+## Alcance funcional
+
+| Requisito | Artefacto | Evidencia | Sección del informe (propuesta) |
+| --- | --- | --- | --- |
+| Consultas sobre productos, condiciones comerciales, pedidos, entregas, incidencias, procedimientos y documentación de proveedores/cumplimiento | [`db/consultas/04_consultas.sql`](../db/consultas/04_consultas.sql) (1–6), [`06_consultas_seguridad.sql`](../db/consultas/06_consultas_seguridad.sql) (7) | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) | Alcance funcional y consultas representativas |
+| Cada respuesta exitosa conserva evidencia documental o estructurada identificable | `evidencia_documental`, `evidencia_estructurada` en [`01_schema.sql`](../db/estructura/01_schema.sql) | [`docs/specs/.../impl-seguridad-recuperacion.md`](specs/capa-datos-rag-distribuidora/impl-seguridad-recuperacion.md) §"Evidencia y resultados" | Modelo de interacción y evidencia |
+| Resultado negativo explícito sin evidencia inventada | `respuesta.tipo_resultado CHECK IN (...)` | [`evidencias/seguridad/matriz_autorizacion.md`](../evidencias/seguridad/matriz_autorizacion.md) §"Contextos inválidos" | Resultados negativos y evidencia |
+| Historial suficiente para explicar respuestas anteriores | `version_documental` (estados `sustituida`/`revocada` no se borran) | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) | Vigencia e historial documental |
+
+## Información y procedencia
+
+| Requisito | Artefacto | Evidencia | Sección del informe (propuesta) |
+| --- | --- | --- | --- |
+| Datos sintéticos, reproducibles, sin datos reales ni licencias externas | [`scripts/generar_datos.py`](../scripts/generar_datos.py), [`data/ejemplos/manifiesto.json`](../data/ejemplos/manifiesto.json) | README §"Reproducibilidad" | Datos sintéticos y reproducibilidad |
+| Clasificación estructurada / semiestructurada / no estructurada / operacional / analítica / sensible / auditoría | [`nosql/modelo_nosql.md`](../nosql/modelo_nosql.md), [`vectorial/modelo_vectorial.md`](../vectorial/modelo_vectorial.md) | — (análisis, no ejecutable) | Clasificación de los datos |
+| Sólo se vectorizan fragmentos documentales; hechos operativos como datos estructurados | [`vectorial/modelo_vectorial.md`](../vectorial/modelo_vectorial.md) §"Qué se vectoriza" | Consultas 1–5 vs. 6–7 en `db/consultas/` | Clasificación de los datos |
+| Documentos con procedencia, versión, vigencia, sensibilidad e integridad verificable | `documento`, `version_documental` en [`01_schema.sql`](../db/estructura/01_schema.sql) | [`docs/diagramas/fisico.mmd`](diagramas/fisico.mmd) | Modelo documental |
+
+## Vigencia y autorización
+
+| Requisito | Artefacto | Evidencia | Sección del informe (propuesta) |
+| --- | --- | --- | --- |
+| Sólo una versión publicada, no revocada y vigente es recuperable por documento | `version_documental_sin_solape_ex` (EXCLUDE parcial), vista `fragmento_recuperable` | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) | Vigencia documental |
+| Publicar sustituye a la anterior sin ventana de inconsistencia | [`docs/specs/.../impl-modelo-datos.md`](specs/capa-datos-rag-distribuidora/impl-modelo-datos.md) §"Integridad e invariantes transaccionales" | — (a demostrar con transacción en el informe) | Publicación y sustitución atómica |
+| Permisos por perfil y clase documental, denegación por defecto, sin excepciones individuales | `permiso_documental`, políticas RLS en [`05_seguridad.sql`](../db/indices_vistas/05_seguridad.sql) | [`evidencias/seguridad/matriz_autorizacion.md`](../evidencias/seguridad/matriz_autorizacion.md) | Matriz de autorización |
+| Vigencia y autorización limitan el universo antes del ranking vectorial | `fragmento_recuperable` + RLS sobre tablas base (no sobre la vista) | Consulta 7 en [`06_consultas_seguridad.sql`](../db/consultas/06_consultas_seguridad.sql) | Recuperación híbrida autorizada |
+| Control de acceso independiente del texto de la consulta o instrucciones al modelo | Funciones `app_actor_id()`, `app_perfil_id()`, `app_clase_autorizada()` en [`05_seguridad.sql`](../db/indices_vistas/05_seguridad.sql) | [`evidencias/seguridad/matriz_autorizacion.md`](../evidencias/seguridad/matriz_autorizacion.md) §"Contextos inválidos" | Contexto efectivo y RLS |
+
+## Trazabilidad
+
+| Requisito | Artefacto | Evidencia | Sección del informe (propuesta) |
+| --- | --- | --- | --- |
+| Registro inmutable de acciones sobre documentos, consultas, accesos, recuperación y evidencia | `evento_auditoria`, trigger `auditoria_inmutable()` en [`05_seguridad.sql`](../db/indices_vistas/05_seguridad.sql) | Consulta 9 en [`06_consultas_seguridad.sql`](../db/consultas/06_consultas_seguridad.sql) | Auditoría append-only |
+| Cada evento identifica actor, perfil efectivo, instante, acción, resultado, recurso y correlación | Columnas de `evento_auditoria` en [`01_schema.sql`](../db/estructura/01_schema.sql) | [`evidencias/seguridad/matriz_autorizacion.md`](../evidencias/seguridad/matriz_autorizacion.md) | Auditoría append-only |
+| La auditoría no duplica contenido sensible de los documentos | `COMMENT ON TABLE evento_auditoria` en [`01_schema.sql`](../db/estructura/01_schema.sql) | — (verificable por inspección del esquema: sin columna de texto de documento) | Auditoría append-only |
+
+## Prueba funcional
+
+| Requisito | Artefacto | Evidencia | Sección del informe (propuesta) |
+| --- | --- | --- | --- |
+| Modelos conceptual, lógico y físico con relaciones, cardinalidades y restricciones | [`docs/diagramas/conceptual.mmd`](diagramas/conceptual.mmd), [`logico.mmd`](diagramas/logico.mmd), [`fisico.mmd`](diagramas/fisico.mmd) + [`fisico_notas.md`](diagramas/fisico_notas.md) | Correspondencia 1:1 con [`01_schema.sql`](../db/estructura/01_schema.sql) | Modelo de datos |
+| Implementación mínima: estructuras, datos, índices, controles de acceso, consultas | `db/estructura/`, `db/datos/`, `db/indices_vistas/`, `db/consultas/` | [`scripts/cargar_base.sh`](../scripts/cargar_base.sh) ejecuta las cinco fases en orden | Implementación |
+| Al menos cinco consultas de negocio y recuperación; conjunto acordado de nueve | [`04_consultas.sql`](../db/consultas/04_consultas.sql) (1–6), [`06_consultas_seguridad.sql`](../db/consultas/06_consultas_seguridad.sql) (7–9) | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) | Consultas representativas |
+| Resultados repetibles tras dos cargas limpias equivalentes | Semilla `42`, instante `2026-06-30T15:00:00Z` en [`generar_datos.py`](../scripts/generar_datos.py) | README §"Reproducibilidad" | Reproducibilidad |
+
+## Requisitos recomendados
+
+| Requisito | Artefacto | Evidencia | Sección del informe (propuesta) |
+| --- | --- | --- | --- |
+| Diagramas regenerables desde fuentes textuales versionadas | [`docs/diagramas/*.mmd`](diagramas/) | [`docs/diagramas/README.md`](diagramas/README.md) (instrucciones de render) | Modelo de datos |
+| Evidencias revisables sin repetir explicaciones del informe | [`evidencias/`](../evidencias/) | — | Evidencias (anexo) |
+| Recuperación con desempate estable | Orden `distancia, fragmento_id` en consultas 6–7 | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) | Recuperación vectorial |
+| Decisiones de rendimiento basadas en planes observados, no en optimizaciones anticipadas | Comentarios de justificación en [`03_indices.sql`](../db/indices_vistas/03_indices.sql) | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) | Rendimiento y escalabilidad |
+
+## Requisitos opcionales
+
+| Requisito | Artefacto | Evidencia | Sección del informe (propuesta) |
+| --- | --- | --- | --- |
+| Separación futura de almacenamiento de archivos e ingesta | README §"Limitaciones y posibles mejoras" | — (análisis, no implementado) | Evolución y trabajo futuro |
+| Réplicas de lectura y particionamiento temporal para tablas de crecimiento continuo | README §"Limitaciones y posibles mejoras"; [`nosql/modelo_nosql.md`](../nosql/modelo_nosql.md) §"Base columnar" | — (análisis, no implementado) | Evolución y trabajo futuro |
+| Métricas operativas adicionales, sin ampliar el dataset ni volverlo benchmark | No ejercido | — | Evolución y trabajo futuro (mención de alcance) |
+
+## Reglas de negocio
+
+| Regla | Artefacto | Evidencia |
+| --- | --- | --- |
+| Un actor pertenece a un único perfil; la consulta conserva el perfil efectivo | FK compuesta `consulta (actor_id, perfil_efectivo_id) → actor (id, perfil_autorizado_id)` | [`fisico_notas.md`](diagramas/fisico_notas.md) §"Claves foráneas compuestas" |
+| Ausencia de permiso perfil-clase implica denegación | `permiso_documental` sin fila = sin acceso; RLS lo aplica | [`evidencias/seguridad/matriz_autorizacion.md`](../evidencias/seguridad/matriz_autorizacion.md) |
+| Estados documentales: borrador, publicada, sustituida, revocada | `version_documental.estado CHECK` | [`01_schema.sql`](../db/estructura/01_schema.sql) |
+| Versiones sustituidas o revocadas se conservan pero no son recuperables | Exclusión parcial `WHERE estado = 'publicada'` + vista `fragmento_recuperable` | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) |
+| Pedido con cliente y al menos una línea; producto no repetido en el pedido | `linea_pedido_producto_uk`; validación atómica de "al menos una línea" en la carga | [`02_seed.sql`](../db/datos/02_seed.sql) |
+| Entrega pertenece a un pedido; entregas parciales admitidas | `entrega.pedido_id`, sin restricción de cardinalidad máxima | [`01_schema.sql`](../db/estructura/01_schema.sql) |
+| Incidencia pertenece a una entrega, nunca directamente a un pedido | `incidencia_operativa.entrega_id NOT NULL` | [`01_schema.sql`](../db/estructura/01_schema.sql) |
+| Condiciones comerciales con historia, sin solape por cliente-producto | `condicion_comercial_sin_solape_ex` (EXCLUDE gist) | Consulta 1 en [`04_consultas.sql`](../db/consultas/04_consultas.sql) |
+| La línea de pedido conserva precio y descuento aplicados (snapshot) | `linea_pedido.precio_unitario/descuento_porcentaje` | [`01_schema.sql`](../db/estructura/01_schema.sql), comentario de columna |
+| Respuesta exitosa requiere evidencia; negativos explícitos no la requieren | Regla de negocio validada por la carga/consultas; no expresable como `CHECK` cruzando tablas | [`docs/specs/.../impl-modelo-datos.md`](specs/capa-datos-rag-distribuidora/impl-modelo-datos.md) §"Interacción y evidencia" |
+| Una misma evidencia no se repite dentro de una respuesta | `evidencia_documental_unica_uk`, `evidencia_estructurada_unica_uk` | [`01_schema.sql`](../db/estructura/01_schema.sql) |
+
+## Riesgos y mitigaciones
+
+| Riesgo | Mitigación exigida | Artefacto que la implementa |
+| --- | --- | --- |
+| Recuperar información no autorizada | Filtrar por perfil y clase antes del ranking; probar las 15 combinaciones | RLS en [`05_seguridad.sql`](../db/indices_vistas/05_seguridad.sql); [`evidencias/seguridad/matriz_autorizacion.md`](../evidencias/seguridad/matriz_autorizacion.md) |
+| Usar contenido obsoleto o revocado | Aplicar estado y vigencia antes de recuperar; conservar historial separado | Vista `fragmento_recuperable`; exclusión parcial en `version_documental` |
+| Presentar una respuesta sin fundamento | Asociar cada éxito a evidencia exacta; reservar sin-evidencia para negativos | `evidencia_documental`/`evidencia_estructurada`; `respuesta.tipo_resultado` |
+| Perder reproducibilidad | Fijar reglas, semilla, instante, conteos y checksums | [`generar_datos.py`](../scripts/generar_datos.py), [`manifiesto.json`](../data/ejemplos/manifiesto.json) |
+| Confundir demostración pequeña con rendimiento productivo | Interpretar planes sobre su escala real | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) |
+| Sobredimensionar la arquitectura | Núcleo único; componentes distribuidos como evolución justificada | [`docs/diagramas/arquitectura.mmd`](diagramas/arquitectura.mmd); README §"Limitaciones" |
+| Duplicar decisiones entre entregables | Fuente de autoridad única por artefacto | Esta matriz; tabla "Autoridad de los entregables" en [`impl-validacion-entregables.md`](specs/capa-datos-rag-distribuidora/impl-validacion-entregables.md) |
+
+## Métricas de éxito
+
+| Métrica | Cómo se verifica | Evidencia |
+| --- | --- | --- |
+| 100% de escenarios de carga y validación con conteos/checksums esperados | Comparar contra `manifiesto.json` tras `cargar_base.sh` | [`data/ejemplos/manifiesto.json`](../data/ejemplos/manifiesto.json) |
+| Las nueve consultas devuelven códigos, valores, conteos y orden deterministas | Ejecutar `04_consultas.sql` y `06_consultas_seguridad.sql` | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) |
+| Las quince combinaciones perfil-clase respetan la matriz acordada | Consulta 8 con `rag_runtime` sin `BYPASSRLS` | [`evidencias/seguridad/matriz_autorizacion.md`](../evidencias/seguridad/matriz_autorizacion.md) |
+| Ninguna búsqueda devuelve contenido fuera del universo autorizado o vigente | Consulta 7 (cero filas fuera del universo permitido) | [`evidencias/seguridad/matriz_autorizacion.md`](../evidencias/seguridad/matriz_autorizacion.md) |
+| Toda respuesta exitosa reconstruible hasta su fuente; negativos sin evidencia ficticia | Consulta 9 (trazabilidad) | [`06_consultas_seguridad.sql`](../db/consultas/06_consultas_seguridad.sql) |
+| Intentos de violar integridad, auditoría o acceso son rechazados | Restricciones `CHECK`/`EXCLUDE`, trigger `auditoria_inmutable`, RLS | [`fisico_notas.md`](diagramas/fisico_notas.md) |
+| Planes de ejecución relevantes registrados e interpretados | `EXPLAIN (ANALYZE, BUFFERS)` con y sin índice HNSW | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) |
+| La documentación cubre todos los puntos obligatorios y permite reproducir la prueba | Esta matriz + README | — |
+
+## Cobertura académica requerida (`impl-validacion-entregables.md`)
+
+| Tema | Dónde está cubierto hoy | Pendiente |
+| --- | --- | --- |
+| Caso de uso, usuarios, riesgos, relevamiento de datos | [`especificacion.md`](especificacion.md) | Trasladar al informe |
+| Clasificación de datos | [`nosql/modelo_nosql.md`](../nosql/modelo_nosql.md), [`vectorial/modelo_vectorial.md`](../vectorial/modelo_vectorial.md) | Trasladar al informe |
+| Modelos conceptual, lógico y físico | [`docs/diagramas/`](diagramas/) | Renderizar SVG/PNG para incluir en el informe |
+| Normalización, uso acotado de JSONB, vínculos a archivos | [`fisico_notas.md`](diagramas/fisico_notas.md), [`01_schema.sql`](../db/estructura/01_schema.sql) | Trasladar al informe |
+| Selección y justificación de PostgreSQL/pgvector | [`nosql/modelo_nosql.md`](../nosql/modelo_nosql.md), [`vectorial/modelo_vectorial.md`](../vectorial/modelo_vectorial.md) | Trasladar al informe |
+| Datos sintéticos, implementación mínima, consultas representativas | `scripts/`, `db/` | Trasladar al informe |
+| Búsqueda vectorial y recuperación autorizada | [`vectorial/modelo_vectorial.md`](../vectorial/modelo_vectorial.md) | Trasladar al informe |
+| Arquitectura general y recorrido de los datos | [`docs/diagramas/arquitectura.mmd`](diagramas/arquitectura.mmd) | Trasladar al informe |
+| Roles, permisos, aislamiento y auditoría | [`05_seguridad.sql`](../db/indices_vistas/05_seguridad.sql), [`evidencias/seguridad/`](../evidencias/seguridad/) | Trasladar al informe |
+| Rendimiento, escalabilidad y conclusiones | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) | Redactar conclusiones en el informe |
+
+**Pendientes de esta matriz que quedan fuera de este trabajo:**
+[`docs/informe_latex/`](informe_latex/) (no existe aún) y los renders
+SVG/PNG de `docs/diagramas/` (fuentes `.mmd` listas, ver
+[`diagramas/README.md`](diagramas/README.md) para generarlos).
