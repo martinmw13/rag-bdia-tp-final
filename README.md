@@ -68,7 +68,8 @@ La justificación frente a alternativas NoSQL y a bases vectoriales dedicadas se
 │   │   └── 05_seguridad.sql           # Roles, RLS y auditoría append-only
 │   └── consultas/
 │       ├── 04_consultas.sql           # Consultas 1 a 6
-│       └── 06_consultas_seguridad.sql # Consultas 7 a 9
+│       ├── 06_consultas_seguridad.sql # Consultas 7 a 9
+│       └── 07_validaciones.sql        # Aserciones automáticas
 ├── nosql/modelo_nosql.md              # Análisis de alternativas NoSQL
 ├── vectorial/modelo_vectorial.md      # Modelo de datos vectorial
 ├── evidencias/
@@ -76,13 +77,15 @@ La justificación frente a alternativas NoSQL y a bases vectoriales dedicadas se
 │   └── seguridad/                     # Matriz de autorización y pruebas negativas
 ├── scripts/
 │   ├── generar_datos.py               # Generador del conjunto sintético
-│   └── cargar_base.sh                 # Recreación completa de la base
+│   ├── cargar_base.sh                 # Recorrido simple de la muestra
+│   └── validar_base.sh                # Validación exhaustiva en dos cargas
 └── anexos/material_complementario.md
 ```
 
 Los archivos SQL están numerados por orden de ejecución, que atraviesa las
 carpetas: `01` y `02` construyen y pueblan, `03` agrega estructuras de acceso,
-`04` consulta, `05` aplica el control de acceso y `06` lo verifica.
+`04` consulta, `05` aplica el control de acceso, `06` lo verifica y `07`
+contiene las aserciones exhaustivas.
 
 ## Instrucciones para ejecutar la implementación mínima
 
@@ -101,11 +104,22 @@ scripts/cargar_base.sh
 ```
 
 El script regenera el conjunto sintético, recrea la base `rag_distribuidora`
-desde cero, aplica los cinco archivos SQL en orden y ejecuta las nueve
-consultas. Acepta otro nombre de base como primer argumento.
+desde cero, aplica el esquema, los datos, los índices y la seguridad, y luego
+ejecuta las nueve consultas. Acepta otro nombre de base como primer argumento.
 
 > La base indicada **se elimina y se vuelve a crear**. No apuntar a una base con
 > datos que interesen.
+
+### Validación exhaustiva
+
+```bash
+scripts/validar_base.sh rag_distribuidora_validacion
+```
+
+Este comando comprueba restricciones, permisos, ciclo documental, auditoría,
+conteos, checksums y oráculos vectoriales. Recrea dos veces la base indicada y
+compara snapshots ordenados. Como medida de seguridad, sólo acepta nombres que
+terminen en `_validacion`.
 
 ### Paso a paso
 
@@ -125,10 +139,9 @@ script de carga lo lee de ahí automáticamente.
 ### Reproducibilidad
 
 El generador usa semilla `42` y el instante de referencia
-`2026-06-30T15:00:00Z`. Nada depende de la hora de ejecución ni del estado
-previo de la base, así que dos ejecuciones limpias producen los mismos
-identificadores, archivos y checksums. La carga es idempotente: `02_seed.sql`
-vacía las tablas antes de insertar.
+`2026-06-30T15:00:00Z`. La carga es idempotente: `02_seed.sql` vacía las tablas
+antes de insertar. `validar_base.sh` demuestra la reproducibilidad al comparar
+conteos, contenido y checksums de dos recreaciones limpias.
 
 ## Principales decisiones de diseño
 

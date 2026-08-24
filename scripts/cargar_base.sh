@@ -58,3 +58,4 @@ psql -d "$BASE" -v ON_ERROR_STOP=1 \
 
 echo
 echo "==> Listo. Base '$BASE' cargada y consultas ejecutadas."
+echo "==> Para ejecutar las aserciones exhaustivas: scripts/validar_base.sh"

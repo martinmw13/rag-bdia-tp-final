@@ -474,4 +474,132 @@ COMMENT ON COLUMN evento_auditoria.actor_id IS
     'Admite NULL: un intento con contexto ausente o inválido debe auditarse '
     'igual, aunque no haya un actor identificable.';
 
+
+-- =============================================================================
+-- 6. INVARIANTES TRANSACCIONALES
+-- =============================================================================
+--
+-- Estas reglas dependen de varias filas y tablas. Los constraint triggers se
+-- evalúan al cerrar la transacción para admitir el orden natural de carga: se
+-- crea primero la cabecera y luego sus líneas o evidencias.
+-- =============================================================================
+
+CREATE OR REPLACE FUNCTION validar_pedido_con_lineas()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_pedido_id BIGINT;
+    v_pedidos BIGINT[];
+BEGIN
+    IF TG_TABLE_NAME = 'pedido' THEN
+        v_pedidos := ARRAY[NEW.id];
+    ELSIF TG_OP = 'INSERT' THEN
+        v_pedidos := ARRAY[NEW.pedido_id];
+    ELSIF TG_OP = 'DELETE' THEN
+        v_pedidos := ARRAY[OLD.pedido_id];
+    ELSE
+        v_pedidos := ARRAY[NEW.pedido_id, OLD.pedido_id];
+    END IF;
+
+    FOR v_pedido_id IN
+        SELECT DISTINCT id FROM unnest(v_pedidos) AS ids(id)
+    LOOP
+        IF EXISTS (SELECT 1 FROM pedido WHERE id = v_pedido_id)
+           AND NOT EXISTS (
+               SELECT 1 FROM linea_pedido WHERE pedido_id = v_pedido_id
+           ) THEN
+            RAISE EXCEPTION 'el pedido % debe tener al menos una línea', v_pedido_id
+                USING ERRCODE = '23514';
+        END IF;
+    END LOOP;
+
+    RETURN NULL;
+END;
+$$;
+
+CREATE CONSTRAINT TRIGGER pedido_con_lineas_desde_pedido_tg
+    AFTER INSERT OR UPDATE ON pedido
+    DEFERRABLE INITIALLY DEFERRED
+    FOR EACH ROW
+    EXECUTE FUNCTION validar_pedido_con_lineas();
+
+CREATE CONSTRAINT TRIGGER pedido_con_lineas_desde_linea_tg
+    AFTER INSERT OR UPDATE OR DELETE ON linea_pedido
+    DEFERRABLE INITIALLY DEFERRED
+    FOR EACH ROW
+    EXECUTE FUNCTION validar_pedido_con_lineas();
+
+CREATE OR REPLACE FUNCTION validar_evidencia_respuesta()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_respuesta_id BIGINT;
+    v_respuestas BIGINT[];
+    v_tipo_resultado TEXT;
+    v_cantidad_evidencias BIGINT;
+BEGIN
+    IF TG_TABLE_NAME = 'respuesta' THEN
+        v_respuestas := ARRAY[NEW.id];
+    ELSIF TG_OP = 'INSERT' THEN
+        v_respuestas := ARRAY[NEW.respuesta_id];
+    ELSIF TG_OP = 'DELETE' THEN
+        v_respuestas := ARRAY[OLD.respuesta_id];
+    ELSE
+        v_respuestas := ARRAY[NEW.respuesta_id, OLD.respuesta_id];
+    END IF;
+
+    FOR v_respuesta_id IN
+        SELECT DISTINCT id FROM unnest(v_respuestas) AS ids(id)
+    LOOP
+        SELECT tipo_resultado
+          INTO v_tipo_resultado
+          FROM respuesta
+         WHERE id = v_respuesta_id;
+
+        IF NOT FOUND THEN
+            CONTINUE;
+        END IF;
+
+        SELECT
+            (SELECT count(*) FROM evidencia_documental
+             WHERE respuesta_id = v_respuesta_id)
+          + (SELECT count(*) FROM evidencia_estructurada
+             WHERE respuesta_id = v_respuesta_id)
+          INTO v_cantidad_evidencias;
+
+        IF v_tipo_resultado = 'exito' AND v_cantidad_evidencias = 0 THEN
+            RAISE EXCEPTION 'la respuesta exitosa % debe tener evidencia',
+                v_respuesta_id
+                USING ERRCODE = '23514';
+        ELSIF v_tipo_resultado <> 'exito' AND v_cantidad_evidencias > 0 THEN
+            RAISE EXCEPTION 'la respuesta negativa % no puede tener evidencia',
+                v_respuesta_id
+                USING ERRCODE = '23514';
+        END IF;
+    END LOOP;
+
+    RETURN NULL;
+END;
+$$;
+
+CREATE CONSTRAINT TRIGGER respuesta_evidencia_desde_respuesta_tg
+    AFTER INSERT OR UPDATE ON respuesta
+    DEFERRABLE INITIALLY DEFERRED
+    FOR EACH ROW
+    EXECUTE FUNCTION validar_evidencia_respuesta();
+
+CREATE CONSTRAINT TRIGGER respuesta_evidencia_documental_tg
+    AFTER INSERT OR UPDATE OR DELETE ON evidencia_documental
+    DEFERRABLE INITIALLY DEFERRED
+    FOR EACH ROW
+    EXECUTE FUNCTION validar_evidencia_respuesta();
+
+CREATE CONSTRAINT TRIGGER respuesta_evidencia_estructurada_tg
+    AFTER INSERT OR UPDATE OR DELETE ON evidencia_estructurada
+    DEFERRABLE INITIALLY DEFERRED
+    FOR EACH ROW
+    EXECUTE FUNCTION validar_evidencia_respuesta();
+
 COMMIT;

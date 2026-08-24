@@ -44,6 +44,10 @@ SET TIME ZONE 'UTC';
 --              vigente.
 -- =============================================================================
 
+BEGIN;
+SET LOCAL ROLE rag_runtime;
+SELECT set_config('rag.actor', 'ACT-003', true);
+
 SELECT
     c.codigo  AS cliente,
     p.codigo  AS producto,
@@ -58,6 +62,8 @@ WHERE c.codigo = 'CLI-001'
   AND p.codigo = 'PRD-001'
   AND cc.vigente_desde <= DATE '2026-06-30'
   AND (cc.vigente_hasta IS NULL OR cc.vigente_hasta > DATE '2026-06-30');
+
+COMMIT;
 
 
 -- =============================================================================
@@ -77,6 +83,10 @@ WHERE c.codigo = 'CLI-001'
 --              formalizadas como incidencia.
 -- =============================================================================
 
+BEGIN;
+SET LOCAL ROLE rag_runtime;
+SELECT set_config('rag.actor', 'ACT-001', true);
+
 SELECT
     p.codigo  AS pedido,
     c.codigo  AS cliente,
@@ -93,6 +103,8 @@ LEFT JOIN incidencia_operativa i ON i.entrega_id = e.id
 WHERE p.estado <> 'cancelado'
   AND e.estado IN ('demorada', 'en_transito')
 ORDER BY p.codigo, e.codigo;
+
+COMMIT;
 
 
 -- =============================================================================
@@ -214,6 +226,10 @@ ORDER BY c.codigo;
 --              dos vectores queden a igual distancia.
 -- =============================================================================
 
+BEGIN;
+SET LOCAL ROLE rag_runtime;
+SELECT set_config('rag.actor', 'ACT-001', true);
+
 SELECT
     fr.fragmento_id,
     fr.documento_codigo,
@@ -224,3 +240,5 @@ SELECT
 FROM fragmento_recuperable fr
 ORDER BY fr.vector <=> :'vector_consulta'::vector, fr.fragmento_id
 LIMIT 5;
+
+COMMIT;

@@ -4,6 +4,12 @@ Capturada sobre PostgreSQL 17.11 con `db/indices_vistas/05_seguridad.sql`
 aplicado. Todas las lecturas se hacen con `rag_runtime`, que **no** es
 propietario, **no** es superusuario y **no** tiene `BYPASSRLS`:
 
+Las aserciones se repiten con:
+
+```bash
+scripts/validar_base.sh rag_distribuidora_validacion
+```
+
 ```
     rolname     | rolsuper | rolbypassrls
 ----------------+----------+--------------
@@ -20,9 +26,9 @@ con el contexto de un actor de cada perfil.
 
 | Perfil | FICHA | PROC | POL | CUMP | LEGAL |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Operaciones/Logística (ACT-001) | 9 | 8 | **0** | **0** | **0** |
-| Comercial/Compras (ACT-003) | 9 | **0** | 7 | **0** | **0** |
-| Administración/Calidad (ACT-005) | 9 | 8 | **0** | 4 | 4 |
+| Operaciones/Logística (ACT-001) | 7 | 6 | **0** | **0** | **0** |
+| Comercial/Compras (ACT-003) | 7 | **0** | 3 | **0** | **0** |
+| Administración/Calidad (ACT-005) | 7 | 6 | **0** | 2 | 2 |
 
 Coincide exactamente con la matriz acordada: dos clases visibles para
 Operaciones, dos para Comercial y cuatro para Administración. Las siete
@@ -31,6 +37,11 @@ combinaciones restantes devuelven cero filas.
 Ninguna cláusula `WHERE` de las consultas produce esos ceros. Las políticas de
 RLS eliminan los fragmentos prohibidos antes, por lo que esas filas no son
 visibles para la transacción.
+
+Los conteos incluyen sólo versiones publicadas y vigentes con embeddings del
+modelo activo. Las versiones sustituidas, revocadas y en borrador tampoco son
+visibles mediante consultas directas a `version_documental`, `fragmento` o
+`embedding`.
 
 ## Contextos inválidos
 
@@ -82,6 +93,7 @@ ranking evita que un `LIMIT` exponga contenido prohibido.
 | Operación | Rol | Resultado |
 | --- | --- | --- |
 | `UPDATE evento_auditoria` | `rag_runtime` | `ERROR: permission denied for table evento_auditoria` |
+| `INSERT INTO evento_auditoria` | `rag_runtime` | `ERROR: permission denied for table evento_auditoria` |
 | `DELETE FROM evento_auditoria` | `rag_runtime` | `ERROR: permission denied for table evento_auditoria` |
 | `UPDATE evento_auditoria` | propietario | `ERROR: evento_auditoria es append-only: UPDATE rechazado` |
 | `UPDATE producto` | `rag_runtime` | `ERROR: permission denied for table producto` |
@@ -91,6 +103,11 @@ La auditoría tiene dos barreras. Los privilegios alcanzan para los roles
 operativos; el disparador `evento_auditoria_inmutable_tg` cubre además el caso
 en que alguien concediera `UPDATE` por error, e incluso alcanza al propietario
 del esquema.
+
+Las inserciones de consultas, respuestas y evidencias generan sus eventos por
+trigger. La publicación, sustitución y revocación registran el cambio dentro de
+la misma transacción. `rag_documental` ejecuta esas operaciones sin recibir
+`UPDATE` directo sobre `version_documental`.
 
 ## Trazabilidad
 
