@@ -11,9 +11,9 @@ estructuras nuevas: documenta las ya construidas y probadas (ver
 
 ## Qué se vectoriza
 
-Únicamente `fragmento`: la sección de una versión documental publicada. Los
-hechos operativos — productos, pedidos, entregas, condiciones comerciales —
-nunca se vectorizan y se consultan siempre como datos estructurados (ver
+Se vectoriza únicamente `fragmento`, que representa una sección de una versión
+documental publicada. Los hechos operativos (productos, pedidos, entregas y
+condiciones comerciales) se consultan como datos estructurados (ver
 consultas 1 a 5 en `db/consultas/04_consultas.sql`). Esta separación evita el
 error más común de un diseño RAG mal planteado: tratar hechos que tienen una
 respuesta exacta y verificable como si fueran texto libre a recuperar por
@@ -25,7 +25,7 @@ El texto que compone el vector combina **título del documento + encabezado de
 la sección + contenido del cuerpo** (contrato fijado en
 `docs/specs/capa-datos-rag-distribuidora/impl-datos-sinteticos.md`, sección
 "Documentos y fragmentación"). `fragmento.contenido` almacena sólo el cuerpo
-propio de la sección — no el texto combinado — porque el contenido debe
+propio de la sección, sin el texto combinado, porque el contenido debe
 poder mostrarse como evidencia sin repetir el título en cada fragmento
 recuperado; el texto combinado es un artefacto de construcción del vector,
 no un dato persistente adicional.
@@ -68,8 +68,8 @@ y `06_consultas_seguridad.sql`):
    comportamiento puro del índice: el fragmento temático esperado debe
    ocupar la primera posición, con desempate estable por `fragmento_id`.
 2. **Recuperación híbrida autorizada (consulta 7).** "Híbrida" significa acá
-   *similitud vectorial combinada con `JOIN` y filtros relacionales* —no
-   ranking lexical + vectorial—: actividad de documento y modelo,
+   *similitud vectorial combinada con `JOIN` y filtros relacionales*, sin
+   ranking lexical + vectorial. La actividad de documento y modelo,
    publicación, vigencia y permiso del perfil efectivo se aplican en el
    mismo plan de ejecución que calcula la distancia coseno, antes del
    `LIMIT`.
@@ -81,12 +81,12 @@ como post-filtro: un fragmento prohibido nunca ocupa un lugar en el top-k
 para luego descartarse. Esto se logra en dos capas independientes:
 
 - La vista `fragmento_recuperable` aplica `d.activo`, `me.activo`,
-  `v.estado = 'publicada'` y el rango de vigencia — condiciones
+  `v.estado = 'publicada'` y el rango de vigencia. Estas condiciones son
   independientes de quién consulta.
 - Las políticas RLS sobre `documento`, `version_documental`, `fragmento` y
   `embedding` (`05_seguridad.sql`) aplican `app_clase_autorizada(clase_id)`,
-  evaluada contra el perfil efectivo de la transacción — condición que sí
-  depende de quién consulta, y que se aplica sobre las **tablas**, no sobre
+  evaluada contra el perfil efectivo de la transacción. Esta condición
+  depende de quién consulta y se aplica sobre las **tablas**, no sobre
   la vista, para que el filtro siga vigente aunque alguien consulte
   `fragmento` o `embedding` directamente en lugar de pasar por la vista.
 
@@ -101,7 +101,7 @@ cero, no "visible pero descartado".
 | --- | --- | --- |
 | Dimensión | 32 (`VECTOR(32)`) | Suficiente para demostrar centroides y vecindarios temáticos con datos sintéticos; evita el costo de manejar 384+ dimensiones sin un modelo real detrás. |
 | Métrica | Distancia coseno (`vector_cosine_ops`) | Es la métrica estándar para embeddings de texto normalizados; coherente con `modelo_embedding.metrica = 'coseno'`. |
-| Índice | HNSW, parámetros por defecto (`m`, `ef_construction` de `pgvector`) | Aproximado pero de alta recuperación (`recall`) a este volumen; ver el plan real con y sin índice en `evidencias/planes_ejecucion.md`. No se ajustaron parámetros porque el volumen de prueba (36 filas) no lo justifica — ver "Casos límite de revisión" en la spec de validación. |
+| Índice | HNSW, parámetros por defecto (`m`, `ef_construction` de `pgvector`) | Aproximado pero de alta recuperación (`recall`) a este volumen; ver el plan real con y sin índice en `evidencias/planes_ejecucion.md`. No se ajustaron parámetros porque el volumen de prueba (36 filas) no lo justifica; ver "Casos límite de revisión" en la spec de validación. |
 | Un vector por fragmento y modelo | `UNIQUE (fragmento_id, modelo_id)` | Permite conservar un embedding histórico junto al activo sin ambigüedad sobre cuál participó en cada respuesta. |
 
 ## Justificación de `pgvector` frente a una base vectorial dedicada
@@ -115,15 +115,13 @@ cero, no "visible pero descartado".
 | Escala productiva (evolución) | Escala vertical primero; búsqueda vectorial a millones de vectores con múltiples réplicas es el punto donde una base dedicada empieza a tener ventaja real. | Gana en throughput de búsqueda pura y en operar el índice de forma aislada del tráfico transaccional. |
 | Complejidad operativa | Un único motor que ya se administra. | Un segundo sistema a desplegar, versionar y sincronizar. |
 
-**Conclusión:** para el volumen y las garantías que pide este TP —
-autorización aplicada antes del ranking, vigencia transaccional y evidencia
-exacta reconstruible — `pgvector` sobre PostgreSQL domina en todas las
-dimensiones relevantes salvo el throughput de búsqueda vectorial pura a gran
-escala, que no es el problema que este caso plantea. Una base vectorial
-dedicada queda como evolución posible, condicionada a que el volumen de
-embeddings crezca varios órdenes de magnitud y a resolver antes cómo
-replicar el filtrado autorizado sin reabrir la ventana de inconsistencia que
-el diseño actual evita.
+Para el volumen del TP, `pgvector` sobre PostgreSQL cubre la autorización
+previa al ranking, la vigencia transaccional y la reconstrucción exacta de la
+evidencia. Una base dedicada tendría ventaja en el throughput de búsqueda
+vectorial pura a gran escala, un problema que este caso no plantea. Podría
+evaluarse si el volumen de embeddings creciera varios órdenes de magnitud y
+después de resolver cómo replicar el filtrado autorizado sin reabrir la
+ventana de inconsistencia que evita el diseño actual.
 
 ## Riesgos si se recupera información incorrecta, desactualizada o no autorizada
 

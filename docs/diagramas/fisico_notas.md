@@ -22,7 +22,7 @@ resumen de navegación, no una segunda especificación.
 
 ## Claves foráneas compuestas
 
-- `actor` declara `UNIQUE (id, perfil_autorizado_id)` únicamente para habilitar la FK compuesta de `consulta (actor_id, perfil_efectivo_id) → actor (id, perfil_autorizado_id)`. Esto impide registrar en `consulta` un perfil que el actor no tiene: no hay delegación posible a nivel de integridad referencial, no solo de aplicación.
+- `actor` declara `UNIQUE (id, perfil_autorizado_id)` únicamente para habilitar la FK compuesta de `consulta (actor_id, perfil_efectivo_id) → actor (id, perfil_autorizado_id)`. Esto impide registrar en `consulta` un perfil que el actor no tiene. La integridad referencial bloquea la delegación aunque la aplicación intente admitirla.
 
 ## Disparadores
 

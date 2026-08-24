@@ -4,7 +4,7 @@
 
 El trabajo propone la capa de datos de un copiloto interno para una empresa distribuidora mayorista. El copiloto recuperará información documental y operativa para responder preguntas de personal autorizado, mostrando la evidencia utilizada y respetando la vigencia y los permisos de cada fuente.
 
-El producto académico no es una aplicación completa. Su resultado será un diseño de datos coherente y una prueba funcional pequeña que demuestre almacenamiento, integridad, recuperación, autorización, trazabilidad y criterios de evolución.
+El producto académico consiste en un diseño de datos coherente y una prueba funcional pequeña que demuestre almacenamiento, integridad, recuperación, autorización, trazabilidad y criterios de evolución. Una aplicación completa queda fuera del alcance.
 
 ## Problema
 
