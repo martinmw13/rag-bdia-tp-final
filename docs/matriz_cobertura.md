@@ -1,9 +1,9 @@
 # Matriz de cobertura
 
 Vincula cada requisito de [`especificacion.md`](especificacion.md) con el
-artefacto que lo implementa y la evidencia que lo demuestra. Es un índice, no
-una segunda narrativa: no repite explicaciones que ya están en la
-especificación, las specs de implementación o el informe. Cuando el informe
+artefacto que lo implementa y la evidencia que lo demuestra. Funciona como
+índice y evita repetir explicaciones de la especificación, las specs de
+implementación o el informe. Cuando el informe
 en LaTeX se escriba, la columna "Sección del informe" debe usarse como guía
 de dónde documentar cada punto; hasta entonces indica la sección propuesta.
 

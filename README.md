@@ -22,7 +22,7 @@ La información de una distribuidora se reparte entre catálogos, condiciones co
 
 Este trabajo diseña la **capa de datos** que soportaría ese copiloto: modelo conceptual, lógico y físico, más una prueba funcional que demuestra almacenamiento, integridad, recuperación semántica autorizada, trazabilidad y criterios de evolución.
 
-No es una aplicación: no incluye frontend, backend, API ni integración efectiva con un modelo de lenguaje. La aplicación de IA funciona como contexto del problema.
+El alcance se limita a la capa de datos. No incluye frontend, backend, API ni integración efectiva con un modelo de lenguaje; la aplicación de IA funciona como contexto del problema.
 
 ## Datos principales identificados
 
@@ -136,7 +136,7 @@ vacía las tablas antes de insertar.
 - **Sólo se vectorizan los fragmentos documentales.** Los hechos operativos se consultan como datos estructurados.
 - **La autorización y la vigencia limitan el universo antes del ranking**, no después: un resultado prohibido nunca ocupa un lugar en el top-k.
 - **Permisos por perfil y clase documental**, con denegación por defecto y sin excepciones individuales. El control de acceso no depende del texto de la consulta.
-- **Los perfiles funcionales no son roles de base de datos.** Son datos, y el permiso surge de una tabla. Los roles de base separan responsabilidades técnicas —ingesta, responsable documental, runtime de consulta y revisor de auditoría— y el runtime asume la identidad del actor por transacción, como una aplicación con pool de conexiones: la conexión es compartida, la identidad no.
+- **Los perfiles funcionales se modelan como datos** y el permiso surge de una tabla. Los roles de base separan las responsabilidades técnicas de ingesta, gestión documental, consulta y revisión de auditoría. El runtime asume la identidad del actor por transacción, como una aplicación con pool de conexiones: la conexión es compartida, la identidad es propia de cada transacción.
 - **El aislamiento se apoya en RLS, no en las consultas.** Las políticas se aplican sobre las tablas, no sobre una vista, de modo que el filtro siga vigente aunque alguien consulte las tablas directamente. La vista de recuperación usa `security_invoker` para no convertirse en un camino que las eluda.
 - **Historial completo**: las versiones sustituidas o revocadas se conservan pero dejan de recuperarse, de modo que una respuesta anterior siga siendo explicable.
 - **Evidencia obligatoria**: toda respuesta exitosa conserva la fuente exacta que utilizó; los resultados negativos se declaran explícitamente y no inventan evidencia.
@@ -167,7 +167,7 @@ están en `db/consultas/06_consultas_seguridad.sql` porque sólo tienen sentido
 con los roles y las políticas de RLS aplicados: se ejecutan con el rol
 `rag_runtime`, que no es propietario ni tiene `BYPASSRLS`.
 
-El resultado más ilustrativo es el de la consulta 7. Con el mismo vector y el
+La consulta 7 muestra el efecto del control de acceso. Con el mismo vector y el
 mismo corpus, Comercial/Compras recibe primero la política comercial buscada,
 mientras que Operaciones/Logística no recibe **ningún** fragmento de esa clase,
 ni siquiera en la última posición del top-5: la autorización limita el universo
@@ -198,7 +198,7 @@ diseño y no de un sistema en producción:
   archivos, réplicas de lectura y particionamiento temporal se analizan como
   evolución, pero no se implementan.
 
-Mejoras naturales si el trabajo continuara: reemplazar los vectores sintéticos
+Si el trabajo continuara, las mejoras serían reemplazar los vectores sintéticos
 por un modelo real y revisar la dimensión y los parámetros del índice HNSW;
 mover los archivos originales a almacenamiento de objetos conservando el
 contrato de checksum; y particionar `evento_auditoria` por tiempo, que es la
@@ -208,7 +208,7 @@ tabla de crecimiento continuo más claro.
 
 - [Especificación del producto](docs/especificacion.md)
 - [Especificaciones de implementación](docs/specs/capa-datos-rag-distribuidora/)
-- Diagramas: [conceptual](docs/modelo_conceptual.png), [lógico](docs/modelo_logico_o_equivalente.png), [físico](docs/modelo_fisico_o_equivalente.png) y [arquitectura](docs/arquitectura.png) — [fuentes Mermaid](docs/diagramas/)
+- Diagramas: [conceptual](docs/modelo_conceptual.png), [lógico](docs/modelo_logico_o_equivalente.png), [físico](docs/modelo_fisico_o_equivalente.png) y [arquitectura](docs/arquitectura.png); [fuentes Mermaid](docs/diagramas/)
 - [Matriz de cobertura](docs/matriz_cobertura.md)
 - [Análisis de alternativas NoSQL](nosql/modelo_nosql.md)
 - [Modelo de datos vectorial](vectorial/modelo_vectorial.md)

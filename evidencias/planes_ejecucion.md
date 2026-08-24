@@ -56,17 +56,16 @@ Limit (actual rows=5 loops=1)
   ->  Index Scan using embedding_vector_hnsw_ix on embedding e (actual rows=5 loops=1)
 ```
 
-El índice existe, es válido y resuelve la consulta por similitud cuando se lo
-utiliza. Lo que la escala del conjunto no permite es que el optimizador lo
-prefiera espontáneamente.
+El índice existe, es válido y resuelve la consulta por similitud. Con este
+tamaño de muestra, el optimizador prefiere recorrer la tabla.
 
 ### Interpretación
 
 Un `Seq Scan` sobre 36 filas no invalida la decisión de crear el índice HNSW.
 El costo de la búsqueda exacta crece linealmente con la cantidad de vectores:
 comparar contra 36 es trivial, contra 500.000 fragmentos deja de serlo. El
-índice está justificado por el patrón de acceso —recuperación top-k por
-distancia coseno, que es la operación central del copiloto— y por el
+índice está justificado por el patrón de acceso (recuperación top-k por
+distancia coseno, la operación central del copiloto) y por el
 crecimiento esperado del corpus documental, no por el tiempo medido acá.
 
 Forzar el uso del índice inflando artificialmente el conjunto habría producido

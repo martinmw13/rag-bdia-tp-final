@@ -28,9 +28,9 @@ Coincide exactamente con la matriz acordada: dos clases visibles para
 Operaciones, dos para Comercial y cuatro para Administración. Las siete
 combinaciones restantes devuelven cero filas.
 
-No hay ninguna cláusula `WHERE` en las consultas que produzca esos ceros: los
-fragmentos prohibidos no son filtrados por la consulta, **no existen** para
-esa transacción, porque las políticas de RLS los eliminan antes.
+Ninguna cláusula `WHERE` de las consultas produce esos ceros. Las políticas de
+RLS eliminan los fragmentos prohibidos antes, por lo que esas filas no son
+visibles para la transacción.
 
 ## Contextos inválidos
 
@@ -48,7 +48,7 @@ defecto, no una excepción programada:
 
 El mismo vector de consulta, ejecutado por dos perfiles distintos:
 
-**Comercial/Compras (ACT-003)** — la política comercial encabeza:
+Para **Comercial/Compras (ACT-003)**, la política comercial encabeza el resultado:
 
 ```
  fragmento_id | documento | clase |       titulo                 | distancia
@@ -60,7 +60,7 @@ El mismo vector de consulta, ejecutado por dos perfiles distintos:
            32 | DOC-010   | FICHA | Especificaciones técnicas    |  0.783020
 ```
 
-**Operaciones/Logística (ACT-001)** — mismo vector, ningún fragmento POL:
+Para **Operaciones/Logística (ACT-001)**, el mismo vector no devuelve fragmentos POL:
 
 ```
  fragmento_id | documento | clase | distancia
@@ -73,11 +73,9 @@ El mismo vector de consulta, ejecutado por dos perfiles distintos:
 ```
 
 Los fragmentos 18, 19 y 20 son los más cercanos al vector en términos absolutos
-y aun así no aparecen para Operaciones, ni siquiera en la quinta posición. No
-fueron recuperados y descartados: quedaron fuera del universo antes de que se
-calculara el orden. Esa es la diferencia entre filtrar antes o después del
-ranking, y es la que evita que un `LIMIT` termine exponiendo contenido
-prohibido.
+y aun así no aparecen para Operaciones, ni siquiera en la quinta posición.
+Quedaron fuera del universo antes de calcular el orden. Este filtro previo al
+ranking evita que un `LIMIT` exponga contenido prohibido.
 
 ## Intentos rechazados
 
@@ -110,8 +108,8 @@ políticas de RLS y con contexto de Administración/Calidad:
  2026-06-30 14:45:02+00 | ACT-001 | OPS    | respuesta_generada   | permitido |
 ```
 
-La evidencia resuelve hasta la fuente exacta —embedding, fragmento, versión,
-documento y modelo— y no hasta el documento vigente:
+La evidencia identifica la fuente exacta (embedding, fragmento, versión,
+documento y modelo), en lugar de apuntar al documento vigente:
 
 ```
  ranking |   score    | documento | version | estado    | fragmento                   | modelo
