@@ -96,10 +96,9 @@ COMMIT;
 --              autorizadas, y ninguna más?
 -- Parámetros : un actor por perfil — ACT-001 (OPS), ACT-003 (COM),
 --              ACT-005 (ADM).
--- Espera     : 15 filas, una por combinación perfil-clase. Con fragmentos
---              visibles: OPS en FICHA y PROC; COM en FICHA y POL; ADM en
---              FICHA, PROC, CUMP y LEGAL. Las otras siete combinaciones
---              devuelven 0.
+-- Espera     : 15 filas, una por combinación perfil-clase. OPS ve 7 fragmentos
+--              FICHA y 6 PROC; COM ve 7 FICHA y 3 POL; ADM ve 7 FICHA, 6 PROC,
+--              2 CUMP y 2 LEGAL. Las otras siete combinaciones devuelven 0.
 -- Patrón     : verificación exhaustiva del control de acceso desde un rol no
 --              propietario.
 -- Utilidad   : demuestra que la matriz declarada en `permiso_documental` es la
