@@ -48,8 +48,10 @@ La justificación frente a alternativas NoSQL y a bases vectoriales dedicadas se
 ```text
 ├── README.md
 ├── docs/
-│   ├── especificacion.md              # Especificación del producto
-│   ├── specs/                         # Especificaciones de implementación
+│   ├── specs/
+│   │   └── capa-datos-rag-distribuidora/
+│   │       ├── PRD.md                 # Especificación del producto
+│   │       └── impl-*.md              # Especificaciones de implementación
 │   ├── matriz_cobertura.md            # Requisito → artefacto → evidencia
 │   ├── modelo_conceptual.png          # Diagramas renderizados
 │   ├── modelo_logico_o_equivalente.png
@@ -206,7 +208,7 @@ tabla de crecimiento continuo más claro.
 
 ## Documentación
 
-- [Especificación del producto](docs/especificacion.md)
+- [Especificación del producto](docs/specs/capa-datos-rag-distribuidora/PRD.md)
 - [Especificaciones de implementación](docs/specs/capa-datos-rag-distribuidora/)
 - Diagramas: [conceptual](docs/modelo_conceptual.png), [lógico](docs/modelo_logico_o_equivalente.png), [físico](docs/modelo_fisico_o_equivalente.png) y [arquitectura](docs/arquitectura.png); [fuentes Mermaid](docs/diagramas/)
 - [Matriz de cobertura](docs/matriz_cobertura.md)
