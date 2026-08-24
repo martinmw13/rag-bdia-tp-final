@@ -72,5 +72,5 @@ exportar.
   relación, no agregando atributos.
 - El diagrama de arquitectura marca con línea punteada el punto donde un
   copiloto/LLM consumiría la evidencia. Ese componente está fuera de alcance
-  del TP y se representa para dar contexto al problema, como aclara
-  `docs/especificacion.md`.
+  del TP y se representa para dar contexto al problema, como aclara la
+  [especificación del producto](../specs/capa-datos-rag-distribuidora/PRD.md).

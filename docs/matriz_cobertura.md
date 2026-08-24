@@ -1,7 +1,8 @@
 # Matriz de cobertura
 
-Vincula cada requisito de [`especificacion.md`](especificacion.md) con el
-artefacto que lo implementa y la evidencia que lo demuestra. Funciona como
+Vincula cada requisito de la
+[especificación del producto](specs/capa-datos-rag-distribuidora/PRD.md) con
+el artefacto que lo implementa y la evidencia que lo demuestra. Funciona como
 índice y evita repetir explicaciones de la especificación, las specs de
 implementación o el informe. Cuando el informe
 en LaTeX se escriba, la columna "Sección del informe" debe usarse como guía
@@ -118,7 +119,7 @@ de dónde documentar cada punto; hasta entonces indica la sección propuesta.
 
 | Tema | Dónde está cubierto hoy | Pendiente |
 | --- | --- | --- |
-| Caso de uso, usuarios, riesgos, relevamiento de datos | [`especificacion.md`](especificacion.md) | Trasladar al informe |
+| Caso de uso, usuarios, riesgos, relevamiento de datos | [Especificación del producto](specs/capa-datos-rag-distribuidora/PRD.md) | Trasladar al informe |
 | Clasificación de datos | [`nosql/modelo_nosql.md`](../nosql/modelo_nosql.md), [`vectorial/modelo_vectorial.md`](../vectorial/modelo_vectorial.md) | Trasladar al informe |
 | Modelos conceptual, lógico y físico | [`docs/diagramas/`](diagramas/) | Renderizar SVG/PNG para incluir en el informe |
 | Normalización, uso acotado de JSONB, vínculos a archivos | [`fisico_notas.md`](diagramas/fisico_notas.md), [`01_schema.sql`](../db/estructura/01_schema.sql) | Trasladar al informe |
