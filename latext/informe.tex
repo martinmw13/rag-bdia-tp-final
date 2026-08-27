@@ -1,0 +1,44 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\geometry{margin=2.5cm}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+\graphicspath{{../docs/}}
+\newcommand{\pendiente}[1]{\textcolor{red}{\textbf{[Pendiente: #1]}}}
+\title{Capa de datos para un copiloto RAG interno de una distribuidora mayorista}
+\author{Martín Madrid \and César Andrés Orellana \and Nicolás Valentín Ciarrapico}
+\date{Trabajo Práctico Integrador -- Bases de Datos para Inteligencia Artificial\\Carrera de Especialización en Inteligencia Artificial -- FIUBA\\2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+\input{secciones/00_resumen}
+\end{abstract}
+\newpage
+\tableofcontents
+\newpage
+\input{secciones/01_caso_uso}
+\input{secciones/02_relevamiento_datos}
+\input{secciones/03_clasificacion_datos}
+\input{secciones/04_modelo_conceptual}
+\input{secciones/05_modelo_implementacion}
+\input{secciones/06_decisiones_diseno}
+\input{secciones/07_justificacion_tecnologica}
+\input{secciones/08_implementacion_minima}
+\input{secciones/09_datos_ejemplo}
+\input{secciones/10_consultas_representativas}
+\input{secciones/11_datos_vectoriales}
+\input{secciones/12_arquitectura_datos}
+\input{secciones/13_seguridad_aislamiento}
+\input{secciones/14_escalabilidad_rendimiento}
+\input{secciones/15_conclusiones}
+\appendix
+\input{secciones/anexo_reproducibilidad}
+
+\end{document}

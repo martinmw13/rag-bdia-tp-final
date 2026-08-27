@@ -1,0 +1,17 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Descripción del caso de uso}{3}{section.1}%
+\contentsline {section}{\numberline {2}Relevamiento de datos necesarios}{3}{section.2}%
+\contentsline {section}{\numberline {3}Clasificación de los datos según su tipo}{4}{section.3}%
+\contentsline {section}{\numberline {4}Modelo conceptual}{5}{section.4}%
+\contentsline {section}{\numberline {5}Modelo de implementación según la tecnología elegida}{5}{section.5}%
+\contentsline {section}{\numberline {6}Decisiones de normalización, embebido, referencia y desnormalización}{6}{section.6}%
+\contentsline {section}{\numberline {7}Justificación de la tecnología seleccionada}{6}{section.7}%
+\contentsline {section}{\numberline {8}Implementación mínima realizada}{6}{section.8}%
+\contentsline {section}{\numberline {9}Datos de ejemplo utilizados}{6}{section.9}%
+\contentsline {section}{\numberline {10}Consultas representativas}{6}{section.10}%
+\contentsline {section}{\numberline {11}Propuesta para datos semiestructurados, no estructurados y vectoriales}{7}{section.11}%
+\contentsline {section}{\numberline {12}Propuesta de arquitectura de datos}{7}{section.12}%
+\contentsline {section}{\numberline {13}Estrategia de seguridad, permisos y aislamiento}{8}{section.13}%
+\contentsline {section}{\numberline {14}Consideraciones de escalabilidad y rendimiento}{8}{section.14}%
+\contentsline {section}{\numberline {15}Conclusiones}{9}{section.15}%
+\contentsline {section}{\numberline {A}Reproducibilidad y material de apoyo}{9}{appendix.Alph1}%
