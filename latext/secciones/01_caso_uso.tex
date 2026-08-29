@@ -1,0 +1,13 @@
+\section{Descripción del caso de uso}
+
+El caso elegido es el de un sistema RAG para consultar documentación técnica. Lo adaptamos al contexto de una distribuidora mayorista, ya que en este tipo de empresa la información está distribuida entre catálogos de productos, condiciones comerciales, pedidos, entregas, incidencias, procedimientos de logística y documentos de proveedores o de cumplimiento. En la práctica, una persona que necesita resolver una consulta debe buscar en varios documentos o preguntarle a alguien que conozca el proceso. Esto puede generar demoras, respuestas diferentes para una misma pregunta y uso de documentación que ya no está vigente.
+
+Nuestra propuesta es diseñar la capa de datos que permitiría a un copiloto interno recuperar información relevante y usarla como fuente para responder. El foco no está en entrenar un modelo ni en crear una aplicación completa. El foco es organizar los datos para que una futura aplicación de IA pueda acceder a información correcta, vigente y autorizada.
+
+Los usuarios principales que consideramos son \textbf{Operaciones y Logística}, que consulta fichas de producto, procedimientos logísticos e incidencias autorizadas; \textbf{Comercial y Compras}, que consulta condiciones comerciales, políticas de venta e información autorizada de proveedores; y \textbf{Administración y Calidad}, que consulta documentación de cumplimiento, documentación legal y la trazabilidad de las respuestas. Además, consideramos servicios internos de ingesta, consulta y administración documental. Estos servicios no representan usuarios finales y tienen permisos mínimos según la tarea que realizan.
+
+El sistema debe poder registrar documentos con versiones, determinar qué versión está vigente, dividir los documentos en fragmentos, asociar embeddings a esos fragmentos y recuperar los más cercanos a una consulta. También debe resolver consultas estructuradas, por ejemplo sobre pedidos, entregas o condiciones comerciales. Para cada respuesta exitosa se guarda la evidencia que indica qué fuente fue utilizada.
+
+Los riesgos más importantes son recuperar contenido no autorizado, usar una versión sustituida o revocada, responder sin poder justificar la fuente y perder la trazabilidad de una consulta anterior. Por este motivo, las tres decisiones centrales del diseño son conservar el historial de versiones, aplicar permisos antes de la recuperación y guardar evidencia y auditoría de las interacciones.
+
+El alcance del trabajo se limita a la capa de datos. No incluimos frontend, backend, API, autenticación de usuarios, integración real con un LLM ni embeddings generados por un modelo comercial. Estos componentes se consideran posibles consumidores futuros de la base diseñada.

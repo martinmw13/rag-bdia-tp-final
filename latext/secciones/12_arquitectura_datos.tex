@@ -1,0 +1,19 @@
+\section{Propuesta de arquitectura de datos}
+
+Para esta primera versión proponemos una arquitectura simple, con una única instancia de PostgreSQL como núcleo de la solución. En esa instancia se concentran los datos operativos, los metadatos documentales, los embeddings, los permisos, las consultas, las respuestas y la auditoría. PostgreSQL tiene las extensiones \texttt{pgvector}, para guardar y consultar embeddings, y \texttt{btree\_gist}, para controlar períodos de vigencia sin solapamientos.
+
+Elegimos un motor único porque el caso necesita combinar en una misma consulta relaciones estructuradas, vigencia de documentos, permisos y búsqueda por similitud. Si separáramos desde el inicio la base relacional y la base vectorial, tendríamos que replicar metadatos como permisos, clase documental y vigencia, y mantenerlos sincronizados. Para el alcance del TP, esa complejidad no se justifica.
+
+El recorrido de los datos comienza con el script \texttt{scripts/generar\_datos.py}, que genera datos sintéticos, documentos Markdown y un manifiesto con conteos, checksums y oráculos de consulta. Luego \texttt{scripts/cargar\_base.sh} crea la base y ejecuta los scripts de esquema, datos, índices, vistas y seguridad. Los documentos se registran junto con sus versiones; cada versión conserva información de vigencia y una referencia verificable al archivo original. Después, cada versión documental se divide en fragmentos y los fragmentos se asocian a embeddings sintéticos de dimensión 32 y a un modelo de embedding.
+
+Cuando se ejecuta una consulta de recuperación, se utiliza la vista de fragmentos recuperables. Esta vista considera la actividad del documento y del modelo, el estado publicado y la vigencia. Las políticas RLS agregan el filtro de permisos del perfil efectivo. Por lo tanto, el ranking vectorial se hace sobre un universo de información ya vigente y autorizado. Si se obtiene una respuesta exitosa, se registra la evidencia documental o estructurada utilizada y se generan eventos de auditoría para reconstruir la interacción.
+
+Los archivos Markdown se mantienen fuera de la base de datos. La base guarda solamente la ruta relativa y los datos necesarios para verificar su integridad. Esta decisión simplifica el modelo físico de la prueba y evita guardar binarios en tablas. En una evolución del sistema, los archivos podrían trasladarse a almacenamiento de objetos, manteniendo el mismo contrato de checksum y procedencia.
+
+No incorporamos un Data Warehouse, Data Lake o Lakehouse porque las consultas del TP son principalmente operativas y transaccionales. Tampoco se requiere un proceso analítico masivo ni se cuenta con fuentes heterogéneas de gran volumen. Si en el futuro se necesitaran indicadores históricos complejos, análisis de uso del copiloto o reportes de negocio a gran escala, sería razonable extraer los eventos y hechos necesarios hacia una capa analítica separada. Esa separación no es necesaria para demostrar el diseño actual.
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{arquitectura.png}
+\caption{Arquitectura general y flujo de datos.}
+\label{fig:arquitectura}
+\end{figure}
