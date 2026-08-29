@@ -1,3 +1,33 @@
 \section{Datos de ejemplo utilizados}
-Los datos son sintéticos y reproducibles: semilla global 42 e instante de referencia \texttt{2026-06-30T15:00:00Z}. El manifiesto conserva conteos, checksums y oráculos de consultas vectoriales.
-\pendiente{Incluir conteos y explicar cobertura de escenarios positivos y negativos.}
+
+Los datos son sintéticos y reproducibles. El generador usa la semilla global
+42 y fija como instante de referencia el 30 de junio de 2026 a las 15:00 UTC.
+El manifiesto conserva la versión del generador, los conteos, el inventario de
+archivos, sus checksums y los oráculos vectoriales.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{l r l}
+\toprule
+Grupo & Cantidad & Componentes principales \\
+\midrule
+Operación & 12 productos, 12 pedidos & 6 clientes, 28 líneas, 14 entregas y 4 incidencias \\
+Documentación & 10 documentos & 14 versiones y 32 fragmentos \\
+Vectores & 36 embeddings & 32 del modelo activo y 4 históricos \\
+Acceso & 6 actores & 3 perfiles, 5 clases y 8 permisos \\
+Interacción & 7 pares & 7 consultas, 7 respuestas y sus evidencias \\
+Auditoría & 56 eventos & Cambios documentales, consultas, accesos y evidencia \\
+\bottomrule
+\end{tabular}
+\caption{Escala principal del conjunto sintético.}
+\end{table}
+
+Los escenarios fueron definidos antes de variar valores con la semilla.
+Incluyen un cliente sin pedidos, un pedido cancelado, entregas parciales, una
+demora con incidencia, condiciones vencidas y futuras, versiones publicadas,
+sustituidas, revocadas y en borrador, un actor inactivo y accesos permitidos y
+denegados. Los 14 archivos Markdown son ficticios y cada encabezado de segundo
+nivel produce un fragmento. Los oráculos fijan como primeros resultados los
+fragmentos 10 para la búsqueda vectorial y 18 para la recuperación híbrida de
+Comercial/Compras.

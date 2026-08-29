@@ -1,3 +1,28 @@
 \section{Reproducibilidad y material de apoyo}
-La carga y validación se reproducen con las instrucciones del \texttt{README.md}. Los planes de ejecución, la matriz de autorización y las validaciones SQL se mantienen como evidencia complementaria, sin sobrecargar el informe.
-\pendiente{Agregar una tabla breve de evidencias si resulta útil.}
+
+La carga y validación se reproducen con las instrucciones del
+\path{README.md}. Las salidas extensas permanecen en el repositorio para que el
+informe pueda interpretarlas sin copiarlas.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.31\linewidth}Y}
+\toprule
+Artefacto & Qué permite comprobar \\
+\midrule
+Manifiesto JSON & Procedencia, semilla, instante de referencia, conteos, checksums y oráculos vectoriales. \\
+Validaciones SQL & Rechazo de operaciones inválidas, aislamiento, ciclo documental y auditoría. \\
+Matriz de autorización & Quince combinaciones perfil--clase, contextos inválidos, autorización previa al ranking y trazabilidad. \\
+Planes de ejecución & Planes observados con HNSW disponible, uso diagnóstico del índice e interpretación de los B-tree. \\
+Matriz de cobertura & Correspondencia entre consigna, informe, implementación y evidencia. \\
+\bottomrule
+\end{tabularx}
+\caption{Evidencias reproducibles del repositorio.}
+\end{table}
+
+Las rutas correspondientes son \path{data/ejemplos/manifiesto.json},
+\path{db/consultas/07_validaciones.sql},
+\path{evidencias/seguridad/matriz_autorizacion.md},
+\path{evidencias/planes_ejecucion.md} y
+\path{docs/matriz_cobertura.md}.

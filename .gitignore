@@ -13,6 +13,15 @@ practica/
 # IDE
 /.idea/
 
+# LaTeX-generated files (the review PDF remains versioned explicitly)
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+
 # Local agent guidance (not part of the academic deliverables)
 /AGENTS.md
 /CLAUDE.md

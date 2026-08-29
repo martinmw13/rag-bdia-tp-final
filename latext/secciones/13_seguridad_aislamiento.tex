@@ -1,3 +1,37 @@
 \section{Estrategia de seguridad, permisos y aislamiento}
-Los permisos se modelan por perfil y clase documental, con denegación por defecto. RLS se aplica sobre tablas documentales y el runtime no es propietario ni posee \texttt{BYPASSRLS}. La auditoría es append-only.
-\pendiente{Describir usuarios, roles técnicos, datos sensibles, contexto transaccional, RLS y pruebas de autorización.}
+
+Los perfiles funcionales son Operaciones y Logística, Comercial y Compras, y
+Administración y Calidad. Cada actor pertenece a uno solo. El permiso se modela
+entre perfil y clase documental; una combinación ausente queda denegada. El
+nivel de sensibilidad describe el dato, pero no reemplaza esa matriz.
+
+Los roles técnicos separan responsabilidades: \texttt{rag\_ingesta} incorpora
+borradores y vectores; \texttt{rag\_documental} publica o revoca mediante
+funciones atómicas; \texttt{rag\_runtime} consulta y registra interacciones; y
+\texttt{rag\_auditor} reconstruye evidencia en modo de lectura. Son roles
+\texttt{NOLOGIN}, sin privilegios de superusuario ni \texttt{BYPASSRLS}. La
+autenticación y la propagación de credenciales pertenecen a una aplicación
+futura y quedan fuera del TP.
+
+Cada transacción fija el código del actor en \texttt{rag.actor}. Las funciones
+de contexto verifican que exista, esté activo y tenga un perfil activo. Un
+valor ausente, vacío, inexistente o inactivo devuelve un contexto nulo y las
+políticas deniegan la lectura. La base deriva el perfil desde el actor y evita
+que ambos valores se contradigan; no autentica, en cambio, quién fija
+\texttt{rag.actor}. Esa responsabilidad queda en la futura capa de aplicación,
+que deberá asociar la identidad autenticada con el actor de cada transacción.
+
+RLS se aplica y fuerza sobre \texttt{documento},
+\texttt{version\_documental}, \texttt{fragmento} y \texttt{embedding}. También
+limita condiciones comerciales e incidencias según el perfil. La vista de
+recuperación usa semántica de invocador, por lo que no ejecuta con privilegios
+del propietario. Las 15 combinaciones perfil--clase, los cuatro contextos
+inválidos y el acceso directo a tablas se comprueban desde un rol no
+propietario.
+
+La auditoría es append-only para los roles operacionales: no pueden insertar
+eventos arbitrarios, modificarlos ni eliminarlos. Los triggers generan eventos
+para consultas, respuestas y evidencias; las funciones documentales registran
+publicación, sustitución y revocación dentro de la misma transacción. El
+propietario conserva \texttt{TRUNCATE} para recrear el conjunto sintético, una
+operación administrativa que no se concede a los roles de aplicación.

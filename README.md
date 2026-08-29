@@ -1,5 +1,26 @@
 # Capa de datos para un copiloto RAG interno de una distribuidora mayorista
 
+## Uso responsable de IA
+
+Este trabajo utilizó IA como apoyo para explorar alternativas, contrastar
+documentos, revisar consistencia y automatizar tareas mecánicas. Las decisiones
+de dominio, alcance, modelado y validación fueron discutidas y aprobadas por los
+tres integrantes. La autoría corresponde exclusivamente al grupo.
+
+Como referencia metodológica tomamos el flujo de ingeniería asistida de
+[Matt Pocock](https://github.com/mattpocock/skills), que su autor distingue del
+\"vibe coding\" sin controles. Antes de implementar, organizamos las preguntas
+abiertas en un mapa compartido, resolvimos cada decisión entre los integrantes,
+consolidamos el resultado en un PRD y contrastamos la implementación con ese
+documento.
+
+La trazabilidad del proceso queda disponible en:
+
+- [Mapa de decisiones: issue #1](https://github.com/martinmw13/rag-bdia-tp-final/issues/1), con enlaces a las diez decisiones resueltas.
+- [Decisión sobre la organización de entregables: issue #11](https://github.com/martinmw13/rag-bdia-tp-final/issues/11).
+- [PRD final](docs/specs/capa-datos-rag-distribuidora/PRD.md) y [PR #23](https://github.com/martinmw13/rag-bdia-tp-final/pull/23), que eliminó la copia duplicada.
+- [Matriz de cobertura](docs/matriz_cobertura.md), que vincula consigna, informe, implementación y evidencia.
+
 **Trabajo Práctico Integrador — Bases de Datos para Inteligencia Artificial**
 Carrera de Especialización en Inteligencia Artificial
 Docente: Martín Lacheski — Año: 2026
@@ -47,6 +68,7 @@ La justificación frente a alternativas NoSQL y a bases vectoriales dedicadas se
 
 ```text
 ├── README.md
+├── latext/                              # Borrador y fuentes del informe técnico
 ├── docs/
 │   ├── specs/
 │   │   └── capa-datos-rag-distribuidora/
@@ -69,8 +91,8 @@ La justificación frente a alternativas NoSQL y a bases vectoriales dedicadas se
 │   │   ├── 03_indices.sql             # Índices y vista de recuperación
 │   │   └── 05_seguridad.sql           # Roles, RLS y auditoría append-only
 │   └── consultas/
-│       ├── 04_consultas.sql           # Consultas 1 a 6
-│       ├── 06_consultas_seguridad.sql # Consultas 7 a 9
+│       ├── 04_consultas.sql           # Consultas funcionales 1 a 6
+│       ├── 06_consultas_seguridad.sql # Consulta 7 y pruebas 8 y 9
 │       └── 07_validaciones.sql        # Aserciones automáticas
 ├── nosql/modelo_nosql.md              # Análisis de alternativas NoSQL
 ├── vectorial/modelo_vectorial.md      # Modelo de datos vectorial
@@ -107,7 +129,8 @@ scripts/cargar_base.sh
 
 El script regenera el conjunto sintético, recrea la base `rag_distribuidora`
 desde cero, aplica el esquema, los datos, los índices y la seguridad, y luego
-ejecuta las nueve consultas. Acepta otro nombre de base como primer argumento.
+ejecuta los nueve casos verificables. Acepta otro nombre de base como primer
+argumento.
 
 > La base indicada **se elimina y se vuelve a crear**. No apuntar a una base con
 > datos que interesen.
@@ -155,17 +178,18 @@ conteos, contenido y checksums de dos recreaciones limpias.
 - **El aislamiento se apoya en RLS, no en las consultas.** Las políticas se aplican sobre las tablas, no sobre una vista, de modo que el filtro siga vigente aunque alguien consulte las tablas directamente. La vista de recuperación usa `security_invoker` para no convertirse en un camino que las eluda.
 - **Historial completo**: las versiones sustituidas o revocadas se conservan pero dejan de recuperarse, de modo que una respuesta anterior siga siendo explicable.
 - **Evidencia obligatoria**: toda respuesta exitosa conserva la fuente exacta que utilizó; los resultados negativos se declaran explícitamente y no inventan evidencia.
-- **Auditoría append-only**, que registra la actividad sin duplicar contenido sensible.
-- **Uso acotado de JSONB**, limitado a metadatos y detalles variables; todo lo que se filtra, relaciona o autoriza permanece tipado y normalizado.
+- **Auditoría append-only para los roles operacionales**, que registra la actividad sin duplicar contenido sensible. El propietario conserva las operaciones administrativas necesarias para recrear la muestra.
+- **Uso acotado de JSONB** para metadatos, parámetros y resultados de forma variable; todo lo que se filtra, relaciona o autoriza permanece tipado y normalizado.
 - **Datos sintéticos reproducibles**, generados con semilla fija y sin dependencias externas.
 
-## Consultas incluidas
+## Casos verificables incluidos
 
-Nueve consultas, con su propósito, parámetros y resultado esperado declarados
-en el propio archivo SQL. Los resultados se expresan en códigos de negocio, no
-en claves internas, para que sobrevivan a una recarga.
+El conjunto contiene siete consultas funcionales y dos pruebas transversales
+de seguridad y auditoría. Cada caso declara su propósito, parámetros y
+resultado esperado en el propio archivo SQL. Los resultados se expresan en
+códigos de negocio, no en claves internas, para que sobrevivan a una recarga.
 
-| # | Consulta | Patrón que demuestra |
+| # | Caso | Patrón que demuestra |
 | --- | --- | --- |
 | 1 | Condición comercial vigente | Selección y filtrado sobre un intervalo semiabierto |
 | 2 | Pedidos y entregas que requieren atención | `JOIN` entre cuatro entidades y `LEFT JOIN` |
@@ -177,12 +201,12 @@ en claves internas, para que sobrevivan a una recarga.
 | 8 | Matriz de autorización | Verificación exhaustiva del control de acceso |
 | 9 | Trazabilidad e inmutabilidad | Auditoría y correlación histórica |
 
-Las consultas 1 a 6 están en `db/consultas/04_consultas.sql`. Las 7, 8 y 9
+Los casos C1 a C6 están en `db/consultas/04_consultas.sql`. C7, C8 y C9
 están en `db/consultas/06_consultas_seguridad.sql` porque sólo tienen sentido
 con los roles y las políticas de RLS aplicados: se ejecutan con el rol
 `rag_runtime`, que no es propietario ni tiene `BYPASSRLS`.
 
-La consulta 7 muestra el efecto del control de acceso. Con el mismo vector y el
+El caso C7 muestra el efecto del control de acceso. Con el mismo vector y el
 mismo corpus, Comercial/Compras recibe primero la política comercial buscada,
 mientras que Operaciones/Logística no recibe **ningún** fragmento de esa clase,
 ni siquiera en la última posición del top-5: la autorización limita el universo
@@ -221,6 +245,7 @@ tabla de crecimiento continuo más claro.
 
 ## Documentación
 
+- [Borrador del informe técnico en LaTeX](latext/README.md)
 - [Especificación del producto](docs/specs/capa-datos-rag-distribuidora/PRD.md)
 - [Especificaciones de implementación](docs/specs/capa-datos-rag-distribuidora/)
 - Diagramas: [conceptual](docs/modelo_conceptual.png), [lógico](docs/modelo_logico_o_equivalente.png), [físico](docs/modelo_fisico_o_equivalente.png) y [arquitectura](docs/arquitectura.png); [fuentes Mermaid](docs/diagramas/)

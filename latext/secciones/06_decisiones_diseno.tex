@@ -1,3 +1,29 @@
 \section{Decisiones de normalización, embebido, referencia y desnormalización}
-La información que se consulta, relaciona o autoriza se conserva tipada y normalizada. JSONB se limita a metadatos variables; los archivos originales se referencian por ruta relativa, tipo MIME, tamaño y checksum.
-\pendiente{Justificar normalización, snapshots históricos, JSONB y decisiones de referencia/duplicación.}
+
+La información que se identifica, relaciona, autoriza o filtra con frecuencia
+se conserva tipada y normalizada. Categorías, perfiles, clases documentales y
+modelos de embedding se separan de las entidades que los usan; las relaciones
+N:M se materializan con tablas intermedias. Este diseño evita repetir nombres
+y reglas en pedidos, documentos o permisos, y permite que las claves foráneas
+rechacen referencias inválidas.
+
+La desnormalización se reserva para hechos históricos. Cada línea de pedido
+guarda el precio y el descuento aplicados, aunque luego cambie la condición
+comercial. De forma análoga, un resultado estructurado conserva parámetros,
+contenido, instante y hash; la evidencia documental fija el embedding usado.
+Estos snapshots no reemplazan a las entidades vigentes: conservan el estado
+necesario para explicar una operación o respuesta pasada.
+
+JSONB se usa en cuatro lugares de estructura variable acotada:
+\path{version_documental.metadatos},
+\path{resultado_estructurado.parametros},
+\path{resultado_estructurado.contenido} y
+\path{evento_auditoria.detalles}. No se crearon índices GIN porque los
+nueve casos verificables no filtran por claves internas de esos objetos. Las
+columnas que intervienen en integridad, autorización o joins permanecen fuera
+de JSONB.
+
+Los archivos Markdown no se embeben en la base. Cada versión los referencia
+mediante una ruta relativa portable y conserva nombre, MIME type, tamaño y
+SHA-256. Así, PostgreSQL controla la identidad del archivo sin convertir la
+tabla de versiones en almacenamiento de binarios.

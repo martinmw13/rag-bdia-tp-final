@@ -4,13 +4,12 @@ Vincula cada requisito de la
 [especificación del producto](specs/capa-datos-rag-distribuidora/PRD.md) con
 el artefacto que lo implementa y la evidencia que lo demuestra. Funciona como
 índice y evita repetir explicaciones de la especificación, las specs de
-implementación o el informe. Cuando el informe
-en LaTeX se escriba, la columna "Sección del informe" debe usarse como guía
-de dónde documentar cada punto; hasta entonces indica la sección propuesta.
+implementación o el informe. La columna "Sección del informe" señala dónde se
+desarrolla cada punto en el borrador LaTeX actual.
 
-> Estado al momento de esta versión: el informe en LaTeX (`docs/informe_latex/`)
-> todavía no existe. Las secciones de esta columna son la propuesta de
-> organización, no enlaces activos.
+> El proyecto fuente y su PDF de revisión están en [`latext/`](../latext/).
+> Cuando concluya la revisión académica, el PDF definitivo se publicará como
+> `docs/informe.pdf`.
 
 ## Alcance funcional
 
@@ -107,7 +106,7 @@ de dónde documentar cada punto; hasta entonces indica la sección propuesta.
 | Métrica | Cómo se verifica | Evidencia |
 | --- | --- | --- |
 | 100% de escenarios de carga y validación con conteos/checksums esperados | [`validar_base.sh`](../scripts/validar_base.sh) compara contra `manifiesto.json` | [`data/ejemplos/manifiesto.json`](../data/ejemplos/manifiesto.json) |
-| Las nueve consultas devuelven códigos, valores, conteos y orden deterministas | Ejecutar `04_consultas.sql` y `06_consultas_seguridad.sql` | [`db/consultas/04_consultas.sql`](../db/consultas/04_consultas.sql) §resultados esperados |
+| Los nueve casos verificables (siete consultas y dos pruebas transversales) devuelven códigos, valores, conteos y orden deterministas | Ejecutar `04_consultas.sql` y `06_consultas_seguridad.sql` | [`db/consultas/04_consultas.sql`](../db/consultas/04_consultas.sql) §resultados esperados |
 | Las quince combinaciones perfil-clase respetan la matriz acordada | Consulta 8 con `rag_runtime` sin `BYPASSRLS` | [`evidencias/seguridad/matriz_autorizacion.md`](../evidencias/seguridad/matriz_autorizacion.md) |
 | Ninguna búsqueda devuelve contenido fuera del universo autorizado o vigente | Consulta 7 (cero filas fuera del universo permitido) | [`evidencias/seguridad/matriz_autorizacion.md`](../evidencias/seguridad/matriz_autorizacion.md) |
 | Toda respuesta exitosa reconstruible hasta su fuente; negativos sin evidencia ficticia | Consulta 9 (trazabilidad) | [`06_consultas_seguridad.sql`](../db/consultas/06_consultas_seguridad.sql) |
@@ -117,21 +116,20 @@ de dónde documentar cada punto; hasta entonces indica la sección propuesta.
 
 ## Cobertura académica requerida (`impl-validacion-entregables.md`)
 
-| Tema | Dónde está cubierto hoy | Pendiente |
+| Tema | Sección del informe | Estado |
 | --- | --- | --- |
-| Caso de uso, usuarios, riesgos, relevamiento de datos | [Especificación del producto](specs/capa-datos-rag-distribuidora/PRD.md) | Trasladar al informe |
-| Clasificación de datos | [`nosql/modelo_nosql.md`](../nosql/modelo_nosql.md), [`vectorial/modelo_vectorial.md`](../vectorial/modelo_vectorial.md) | Trasladar al informe |
-| Modelos conceptual, lógico y físico | [`docs/diagramas/`](diagramas/) | Renderizar SVG/PNG para incluir en el informe |
-| Normalización, uso acotado de JSONB, vínculos a archivos | [`fisico_notas.md`](diagramas/fisico_notas.md), [`01_schema.sql`](../db/estructura/01_schema.sql) | Trasladar al informe |
-| Selección y justificación de PostgreSQL/pgvector | [`nosql/modelo_nosql.md`](../nosql/modelo_nosql.md), [`vectorial/modelo_vectorial.md`](../vectorial/modelo_vectorial.md) | Trasladar al informe |
-| Datos sintéticos, implementación mínima, consultas representativas | `scripts/`, `db/` | Trasladar al informe |
-| Búsqueda vectorial y recuperación autorizada | [`vectorial/modelo_vectorial.md`](../vectorial/modelo_vectorial.md) | Trasladar al informe |
-| Arquitectura general y recorrido de los datos | [`docs/diagramas/arquitectura.mmd`](diagramas/arquitectura.mmd) | Trasladar al informe |
-| Roles, permisos, aislamiento y auditoría | [`05_seguridad.sql`](../db/indices_vistas/05_seguridad.sql), [`evidencias/seguridad/`](../evidencias/seguridad/) | Trasladar al informe |
-| Rendimiento, escalabilidad y conclusiones | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) | Redactar conclusiones en el informe |
+| Caso de uso, usuarios, riesgos y relevamiento de datos | [`01_caso_uso.tex`](../latext/secciones/01_caso_uso.tex), [`02_relevamiento_datos.tex`](../latext/secciones/02_relevamiento_datos.tex) | Cubierto |
+| Clasificación de datos | [`03_clasificacion_datos.tex`](../latext/secciones/03_clasificacion_datos.tex) | Cubierto |
+| Modelos conceptual, lógico y físico | [`04_modelo_conceptual.tex`](../latext/secciones/04_modelo_conceptual.tex), [`05_modelo_implementacion.tex`](../latext/secciones/05_modelo_implementacion.tex) | Cubierto; incluye los diagramas renderizados |
+| Normalización, JSONB, embebido y referencias | [`06_decisiones_diseno.tex`](../latext/secciones/06_decisiones_diseno.tex) | Cubierto |
+| Selección y justificación tecnológica | [`07_justificacion_tecnologica.tex`](../latext/secciones/07_justificacion_tecnologica.tex) | Cubierto |
+| Implementación mínima, datos y consultas | [`08_implementacion_minima.tex`](../latext/secciones/08_implementacion_minima.tex), [`09_datos_ejemplo.tex`](../latext/secciones/09_datos_ejemplo.tex), [`10_consultas_representativas.tex`](../latext/secciones/10_consultas_representativas.tex) | Cubierto |
+| Datos vectoriales y recuperación autorizada | [`11_datos_vectoriales.tex`](../latext/secciones/11_datos_vectoriales.tex) | Cubierto |
+| Arquitectura general y recorrido de datos | [`12_arquitectura_datos.tex`](../latext/secciones/12_arquitectura_datos.tex) | Cubierto |
+| Roles, permisos, aislamiento y auditoría | [`13_seguridad_aislamiento.tex`](../latext/secciones/13_seguridad_aislamiento.tex) | Cubierto |
+| Rendimiento, escalabilidad y conclusiones | [`14_escalabilidad_rendimiento.tex`](../latext/secciones/14_escalabilidad_rendimiento.tex), [`15_conclusiones.tex`](../latext/secciones/15_conclusiones.tex) | Cubierto |
 
-**Pendiente de esta matriz:** el informe (`docs/informe_latex/`), que todavía
-no existe. Los renders de los diagramas ya están publicados en `docs/` con los
-nombres que enumera la consigna; sus fuentes `.mmd` siguen siendo la autoridad
-y se regeneran con el procedimiento de
-[`diagramas/README.md`](diagramas/README.md).
+El único paso editorial pendiente es publicar el PDF definitivo en
+`docs/informe.pdf` una vez concluida la revisión académica. Las fuentes Mermaid
+siguen siendo la autoridad de los diagramas y se regeneran mediante el
+procedimiento de [`diagramas/README.md`](diagramas/README.md).

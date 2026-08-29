@@ -1,3 +1,19 @@
 \section{Implementación mínima realizada}
-La prueba funcional incluye esquema, carga, índices, vista de recuperación, seguridad, consultas y validaciones. Se reproduce con \texttt{scripts/cargar\_base.sh} y se valida con \texttt{scripts/validar\_base.sh}.
-\pendiente{Describir fases de ejecución y evidencia que produce cada una.}
+
+La prueba funcional se ejecuta en fases numeradas. El esquema crea extensiones,
+tablas y restricciones; el seed carga el conjunto sintético; el tercer script
+agrega índices y la vista de recuperación; el quinto crea roles, privilegios,
+políticas RLS y auditoría. Los archivos de consultas ejecutan los casos C1--C9
+y un archivo separado reúne aserciones negativas de integridad y seguridad.
+
+El comando \path{scripts/cargar_base.sh} ofrece un recorrido legible: regenera
+los artefactos, recrea la base y muestra los resultados de los casos. El
+comando \path{scripts/validar_base.sh} se reserva para la verificación
+exhaustiva. Sólo acepta una base cuyo nombre termine en
+\texttt{\_validacion}, la recrea dos veces, comprueba checksums y conteos,
+ejecuta rechazos controlados, valida permisos y compara snapshots ordenados.
+
+La implementación se detiene allí. No agrega un backend que oculte las reglas
+de la base ni una interfaz para simular una aplicación completa. Las pruebas
+usan directamente SQL y roles técnicos, que permiten observar si cada contrato
+se cumple en la capa de datos.
