@@ -4,7 +4,8 @@ Para diseñar la solución separamos los datos según el papel que tienen dentro
 
 \begin{table}[ht]
 \centering
-\begin{tabular}{p{0.24\linewidth}p{0.37\linewidth}p{0.29\linewidth}}
+\small
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.20\linewidth}Y Y}
 \toprule
 Grupo & Datos principales & Uso dentro de la solución \\
 \midrule
@@ -15,17 +16,17 @@ Vectoriales & Modelos de embedding y vectores de cada fragmento. & Resolver bús
 Acceso & Actores, perfiles autorizados y permisos por clase documental. & Limitar qué documentos puede recuperar cada perfil. \\
 Interacción y auditoría & Consultas, respuestas, evidencias y eventos de auditoría. & Explicar respuestas anteriores y registrar acciones relevantes. \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \caption{Datos relevados para la solución.}
 \label{tab:relevamiento}
 \end{table}
 
 Los datos operativos son necesarios porque el copiloto no debería resolver por similitud preguntas que tienen una respuesta exacta en la base. Por ejemplo, la condición comercial vigente se obtiene cruzando cliente, producto y fecha; los pedidos con entregas demoradas se obtienen relacionando pedidos, entregas e incidencias. Guardar estos datos de forma estructurada permite aplicar restricciones, realizar agregaciones y evitar ambigüedades.
 
-Para el corpus documental necesitamos registrar más información que el texto. Cada documento tiene una clase, un nivel de sensibilidad, una procedencia y una o varias versiones. Cada versión conserva el archivo original mediante su ruta relativa, nombre, tipo MIME, tamaño y checksum SHA-256. De esta manera, la base no guarda el archivo completo, pero puede verificar que el archivo al que hace referencia es el esperado.
+Para el corpus documental necesitamos registrar más información que el texto. Cada documento tiene una clase, un nivel de sensibilidad, una procedencia y una o varias versiones. Cada versión conserva el archivo original mediante su ruta relativa, nombre, tipo MIME, tamaño y checksum SHA-256. La base verifica así la identidad del archivo sin guardar su contenido completo.
 
 Cada versión se divide en fragmentos. El fragmento es la unidad que se vectoriza y también la unidad que luego se puede mostrar como evidencia. Esto permite indicar con precisión qué sección de qué versión fue utilizada para fundamentar una respuesta, en lugar de asociar la respuesta a un documento completo.
 
-Los datos de acceso son importantes porque no todos los perfiles pueden ver las mismas clases documentales. El permiso se modela como una relación entre perfil y clase documental. La ausencia de un permiso significa denegación, por lo que no se necesitan listas de excepciones individuales. Finalmente, los datos de interacción y auditoría permiten reconstruir quién consultó, con qué perfil, qué resultado obtuvo y qué evidencia se utilizó, sin duplicar el contenido sensible de los documentos en el registro de auditoría.
+Cada perfil puede ver un conjunto distinto de clases documentales. El permiso se modela como una relación entre perfil y clase, y la ausencia de esa relación significa denegación. Los datos de interacción y auditoría registran quién consultó, con qué perfil, qué resultado obtuvo y qué evidencia se utilizó, sin duplicar el contenido sensible de los documentos.
 
 Para la implementación usamos datos sintéticos. Esto evita trabajar con datos personales, comerciales o documentos internos reales y permite repetir la carga con los mismos conteos, archivos, vectores y resultados esperados.

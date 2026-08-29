@@ -10,7 +10,8 @@ Definir qué debe comprobar la prueba funcional y cómo se reparte la autoridad 
 - `db/indices_vistas/`, para las estructuras justificadas por consultas reales.
 - `evidencias/`, para resultados esperados, seguridad y planes.
 - `docs/diagramas/`, para fuentes Mermaid y sus renders.
-- `docs/informe_latex/`, para la narrativa académica.
+- `latext/`, para las fuentes y el PDF de revisión del informe; la versión
+  definitiva se publicará en `docs/informe.pdf`.
 - `docs/matriz_cobertura.md`, para vincular la consigna con artefactos y evidencia.
 - `README.md`, para la entrada y reproducción de la entrega.
 

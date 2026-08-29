@@ -6,12 +6,14 @@
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{tabularx}
 \usepackage{hyperref}
+\usepackage{xurl}
 \usepackage{xcolor}
 \geometry{margin=2.5cm}
 \hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
 \graphicspath{{../docs/}}
-\newcommand{\pendiente}[1]{\textcolor{red}{\textbf{[Pendiente: #1]}}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \title{Capa de datos para un copiloto RAG interno de una distribuidora mayorista}
 \author{Martín Madrid \and César Andrés Orellana \and Nicolás Valentín Ciarrapico}
 \date{Trabajo Práctico Integrador -- Bases de Datos para Inteligencia Artificial\\Carrera de Especialización en Inteligencia Artificial -- FIUBA\\2026}
