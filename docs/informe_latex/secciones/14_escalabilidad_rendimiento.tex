@@ -1,17 +1,42 @@
 \section{Consideraciones de escalabilidad y rendimiento}
 
-La implementación usa una muestra pequeña y su objetivo es validar el diseño, no medir rendimiento de producción. La tabla más grande de la carga tiene 56 filas y la tabla de embeddings tiene 36 filas. Por este motivo, los tiempos observados y los planes de ejecución no se deben extrapolar directamente a un sistema real con muchos usuarios y documentos.
+La muestra sirve para validar el diseño, no para medir rendimiento. La tabla más
+grande tiene 56 filas y \texttt{embedding} tiene 36. Los tiempos y planes
+observados no se pueden extrapolar a un sistema real.
 
-Las estructuras que crecerían más en un escenario real son \texttt{evento\_auditoria}, \texttt{consulta}, \texttt{respuesta}, \texttt{fragmento} y \texttt{embedding}. La auditoría crece con cada acción relevante y no se elimina, por lo que es la candidata más clara para aplicar particionado por rango de fecha. Por ejemplo, se podrían crear particiones mensuales o trimestrales de \texttt{evento\_auditoria}, según el volumen de escritura y el período de retención requerido.
+Las tablas que más crecerían son \texttt{evento\_auditoria}, \texttt{consulta},
+\texttt{respuesta}, \texttt{fragmento} y \texttt{embedding}. La auditoría suma
+una fila por cada acción y no se elimina. Por eso es la primera candidata para
+un particionado mensual o trimestral, según el volumen y la retención necesaria.
 
-Los fragmentos y embeddings crecerían a medida que se incorporen documentos o nuevas versiones. En el modelo actual, cada fragmento puede tener un embedding por modelo. Esto permite conservar vectores históricos, pero también implica que una migración de modelo de embedding aumenta temporalmente el volumen de la tabla. Una política de retención de modelos antiguos y la separación entre modelos activos e históricos ayudarían a controlar ese crecimiento.
+Los fragmentos y embeddings crecen con cada documento o versión. Un fragmento
+puede tener un embedding por modelo, lo que permite conservar vectores
+históricos. Durante una migración de modelo, el volumen aumenta de forma
+temporal. Una política de retención puede limitar ese crecimiento.
 
-Las consultas más críticas son las búsquedas vectoriales top-k y las búsquedas híbridas autorizadas. Estas últimas combinan similitud por coseno, estado del documento, vigencia y permisos. Para la búsqueda por similitud se creó un índice HNSW sobre el vector, usando \texttt{vector\_cosine\_ops}. El índice está justificado por el patrón de recuperación esperado cuando el corpus crece, aunque en la muestra el optimizador elija un \textit{sequential scan}: recorrer 36 vectores es más barato que entrar al índice. La evidencia de este comportamiento está documentada en \texttt{evidencias/planes\_ejecucion.md}.
+Las consultas críticas son las búsquedas top-k y las híbridas autorizadas. Estas
+últimas combinan distancia coseno, estado, vigencia y permisos. Se creó un índice
+HNSW con \path{vector_cosine_ops} para el crecimiento previsto. En la
+muestra, el optimizador elige una exploración secuencial (\texttt{Seq Scan})
+porque recorrer 36 vectores es más barato. El plan está documentado en
+\path{evidencias/planes_ejecucion.md}.
 
-También se definieron índices B-tree para los filtros y relaciones usadas por las consultas representativas: condiciones comerciales por cliente y producto, entregas e incidencias, relaciones de pedidos, filtros de vigencia documental y correlaciones de auditoría. No se agregaron índices para todas las columnas, porque cada índice mejora algunas lecturas pero agrega espacio y costo en las escrituras.
+Los índices B-tree cubren los filtros y relaciones de las consultas: condiciones
+comerciales, entregas, incidencias, pedidos, vigencia y auditoría. No se indexa
+cada columna, porque los índices ocupan espacio y encarecen las escrituras.
 
-Una primera estrategia de escalabilidad sería aumentar los recursos de la instancia de PostgreSQL y revisar periódicamente los planes de ejecución. Si el tráfico de lectura creciera, se podrían agregar réplicas de sólo lectura para reportes o consultas que no requieran consistencia inmediata. Las operaciones de publicación, permisos y auditoría deberían mantenerse en la instancia principal para conservar la consistencia transaccional.
+Primero se aumentarían los recursos de PostgreSQL y se revisarían los planes de
+ejecución. Las réplicas de lectura sólo se justifican si crece el tráfico y las
+mediciones muestran un límite. La publicación, los permisos y la auditoría deben
+quedar en la instancia principal para conservar la consistencia transaccional.
 
-En una etapa posterior se podrían separar algunos componentes. Los archivos originales podrían ir a almacenamiento de objetos; los eventos de auditoría podrían particionarse o moverse a una solución orientada a escritura masiva; y una base vectorial dedicada podría evaluarse si la cantidad de embeddings y el throughput de búsquedas crecieran varios órdenes de magnitud. Sin embargo, esa última alternativa requeriría mantener sincronizados los permisos y la vigencia con el índice vectorial, por lo que agrega complejidad y riesgo de inconsistencia.
+Más adelante podrían separarse algunos componentes: archivos en almacenamiento
+de objetos, auditoría particionada o un motor orientado a escritura masiva. Una
+base vectorial dedicada sólo se justifica si los embeddings y el volumen de
+búsquedas por segundo crecen varios órdenes de magnitud. Esa opción obliga a
+sincronizar permisos y vigencia entre motores, con más complejidad y riesgo de
+inconsistencia.
 
-La separación de componentes debe responder a mediciones: crecimiento por tabla, latencia del top-k, costo de escritura de auditoría y tolerancia a consistencia diferida. Hasta que esos datos muestren un límite, particionar o replicar dentro de PostgreSQL conserva las garantías actuales con menos coordinación entre sistemas.
+La decisión debe basarse en crecimiento por tabla, latencia del top-k, costo de
+auditoría y tolerancia a consistencia diferida. Hasta que esas mediciones muestren
+un límite, PostgreSQL conserva las garantías actuales con menos coordinación.

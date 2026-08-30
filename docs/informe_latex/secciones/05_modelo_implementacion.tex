@@ -2,9 +2,8 @@
 
 \subsection{Modelo lógico relacional}
 
-El modelo lógico conserva las tres áreas del modelo conceptual. Reparte las
-tablas, columnas, claves y relaciones entre tres figuras para que puedan leerse
-sin perder la correspondencia con el esquema. Las
+El modelo lógico conserva las tres áreas conceptuales. Las tablas, columnas,
+claves y relaciones se reparten entre tres figuras. Las
 Figuras~\ref{fig:logico-operacion} a~\ref{fig:logico-interaccion} deben leerse
 en conjunto.
 
@@ -35,21 +34,19 @@ en conjunto.
 \FloatBarrier
 
 Las entidades con identidad propia usan claves sustitutas. Los códigos de
-producto, cliente, proveedor, pedido y documento funcionan como claves de
-negocio únicas. Las tablas asociativas usan claves compuestas cuando la pareja
-de referencias identifica la fila. El recorrido documental enlaza
+producto, cliente, proveedor, pedido y documento son claves de negocio únicas.
+Las tablas asociativas usan claves compuestas cuando dos referencias identifican
+la fila. El recorrido documental enlaza
 \texttt{documento}, \texttt{version\_documental}, \texttt{fragmento} y
-\texttt{embedding}; la evidencia conserva la referencia exacta que permite
-reconstruir la fuente de una respuesta.
+\texttt{embedding}. La evidencia conserva la referencia exacta de la fuente.
 \FloatBarrier
 
 \subsection{Modelo físico en PostgreSQL}
 
-El modelo físico describe cómo PostgreSQL materializa el diseño. Las
-Figuras~\ref{fig:fisico-operacion} a~\ref{fig:fisico-seguridad} reparten las
-tablas, los tipos y las restricciones principales entre tres ámbitos. Los
-scripts de \path{db/} siguen siendo la autoridad sobre el comportamiento
-implementado.
+El modelo físico lleva el diseño a PostgreSQL. Las
+Figuras~\ref{fig:fisico-operacion} a~\ref{fig:fisico-seguridad} muestran las
+tablas, los tipos y las restricciones de cada área. Los scripts de \path{db/}
+definen el comportamiento implementado.
 
 \begin{landscape}
 \begin{figure}[p]
@@ -106,9 +103,8 @@ rol de ejecución altere el historial. \\
 \end{table}
 \FloatBarrier
 
-Los índices B-tree acompañan claves foráneas, filtros y joins usados por las
-consultas representativas. El índice HNSW cubre el acceso vectorial. Los
-intervalos semiabiertos y las restricciones \texttt{EXCLUDE USING gist}
-impiden solapamientos en condiciones comerciales y versiones publicadas. Los
-constraint triggers diferidos comprueban al cierre de la transacción las
-reglas que no pueden expresarse sobre una sola fila.
+Los índices B-tree cubren claves foráneas, filtros y joins usados por las
+consultas. HNSW cubre el acceso vectorial. Los intervalos semiabiertos y
+\texttt{EXCLUDE USING gist} impiden solapamientos en condiciones comerciales y
+versiones publicadas. Los constraint triggers diferidos validan al cerrar la
+transacción las reglas que abarcan varias filas.

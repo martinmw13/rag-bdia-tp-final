@@ -1,18 +1,17 @@
 \section{Decisiones de normalización, embebido, referencia y desnormalización}
 
-La información que se identifica, relaciona, autoriza o filtra con frecuencia
-se conserva tipada y normalizada. Categorías, perfiles, clases documentales y
-modelos de embedding se separan de las entidades que los usan; las relaciones
-N:M se materializan con tablas intermedias. Este diseño evita repetir nombres
-y reglas en pedidos, documentos o permisos, y permite que las claves foráneas
-rechacen referencias inválidas.
+La información que se identifica, relaciona, autoriza o filtra se mantiene
+tipada y normalizada. Categorías, perfiles, clases documentales y modelos de
+embedding se separan de las entidades que los usan. Las relaciones N:M usan
+tablas intermedias. Así no se repiten nombres ni reglas, y las claves foráneas
+rechazan referencias inválidas.
 
 La desnormalización se reserva para hechos históricos. Cada línea de pedido
-guarda el precio y el descuento aplicados, aunque luego cambie la condición
-comercial. De forma análoga, un resultado estructurado conserva parámetros,
-contenido, instante y hash; la evidencia documental fija el embedding usado.
-Estos snapshots no reemplazan a las entidades vigentes: conservan el estado
-necesario para explicar una operación o respuesta pasada.
+guarda el precio y el descuento aplicados, aunque cambie la condición
+comercial. Un resultado estructurado conserva parámetros, contenido, instante y
+hash; la evidencia documental fija el embedding usado. Estas instantáneas no
+reemplazan a las entidades vigentes: guardan el estado necesario para explicar
+una operación o respuesta pasada.
 
 JSONB se usa en cuatro lugares de estructura variable acotada:
 \path{version_documental.metadatos},
@@ -23,7 +22,6 @@ nueve casos verificables no filtran por claves internas de esos objetos. Las
 columnas que intervienen en integridad, autorización o joins permanecen fuera
 de JSONB.
 
-Los archivos Markdown no se embeben en la base. Cada versión los referencia
-mediante una ruta relativa portable y conserva nombre, MIME type, tamaño y
-SHA-256. Así, PostgreSQL controla la identidad del archivo sin convertir la
-tabla de versiones en almacenamiento de binarios.
+Los archivos Markdown no se guardan en la base. Cada versión conserva una ruta
+relativa, nombre, tipo MIME, tamaño y SHA-256. Así PostgreSQL controla la
+identidad del archivo sin guardar binarios en la tabla de versiones.

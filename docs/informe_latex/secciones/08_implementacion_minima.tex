@@ -1,19 +1,17 @@
 \section{Implementación mínima realizada}
 
 La prueba funcional se ejecuta en fases numeradas. El esquema crea extensiones,
-tablas y restricciones; el seed carga el conjunto sintético; el tercer script
-agrega índices y la vista de recuperación; el quinto crea roles, privilegios,
-políticas RLS y auditoría. Los archivos de consultas ejecutan los casos C1--C9
-y un archivo separado reúne aserciones negativas de integridad y seguridad.
+tablas y restricciones. El seed carga los datos sintéticos. Los scripts
+siguientes agregan índices, la vista de recuperación, roles, privilegios, RLS y
+auditoría. Otros archivos ejecutan los casos C1--C9 y las validaciones negativas
+de integridad y seguridad.
 
-El comando \path{scripts/cargar_base.sh} ofrece un recorrido legible: regenera
-los artefactos, recrea la base y muestra los resultados de los casos. El
-comando \path{scripts/validar_base.sh} se reserva para la verificación
-exhaustiva. Sólo acepta una base cuyo nombre termine en
-\texttt{\_validacion}, la recrea dos veces, comprueba checksums y conteos,
-ejecuta rechazos controlados, valida permisos y compara snapshots ordenados.
+\path{scripts/cargar_base.sh} regenera los artefactos, recrea la base y muestra
+los casos. \path{scripts/validar_base.sh} hace la validación completa. Sólo
+acepta una base terminada en \texttt{\_validacion}; la recrea dos veces,
+comprueba conteos y checksums, prueba el rechazo de operaciones inválidas,
+valida permisos y compara instantáneas ordenadas.
 
-La implementación se detiene allí. No agrega un backend que oculte las reglas
-de la base ni una interfaz para simular una aplicación completa. Las pruebas
-usan directamente SQL y roles técnicos, que permiten observar si cada contrato
-se cumple en la capa de datos.
+La implementación termina en la capa de datos. No se agrega un backend ni una
+interfaz para simular una aplicación completa. Las pruebas usan SQL y roles
+técnicos para comprobar cada contrato de forma directa.

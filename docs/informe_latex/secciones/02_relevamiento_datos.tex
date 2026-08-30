@@ -1,6 +1,8 @@
 \section{Relevamiento de datos necesarios}
 
-Para diseñar la solución separamos los datos según el papel que tienen dentro del problema. No todos los datos tienen el mismo ciclo de vida ni se consultan de la misma forma. Por ejemplo, un pedido se consulta con filtros y relaciones exactas, mientras que un procedimiento escrito se recupera por similitud semántica.
+Los datos se separan según su función. Un pedido se consulta con filtros y
+relaciones exactas; un procedimiento escrito se recupera por similitud
+semántica. Cada grupo también tiene un ciclo de vida distinto.
 
 \begin{table}[ht]
 \centering
@@ -21,12 +23,26 @@ Interacción y auditoría & Consultas, respuestas, evidencias y eventos de audit
 \label{tab:relevamiento}
 \end{table}
 
-Los datos operativos son necesarios porque el copiloto no debería resolver por similitud preguntas que tienen una respuesta exacta en la base. Por ejemplo, la condición comercial vigente se obtiene cruzando cliente, producto y fecha; los pedidos con entregas demoradas se obtienen relacionando pedidos, entregas e incidencias. Guardar estos datos de forma estructurada permite aplicar restricciones, realizar agregaciones y evitar ambigüedades.
+Las preguntas con una respuesta exacta no se resuelven por similitud. La
+condición comercial vigente se obtiene por cliente, producto y fecha. Los
+pedidos demorados se obtienen al relacionar pedidos, entregas e incidencias. La
+estructura permite aplicar restricciones, agregar resultados y evitar
+ambigüedades.
 
-Para el corpus documental necesitamos registrar más información que el texto. Cada documento tiene una clase, un nivel de sensibilidad, una procedencia y una o varias versiones. Cada versión conserva el archivo original mediante su ruta relativa, nombre, tipo MIME, tamaño y checksum SHA-256. La base verifica así la identidad del archivo sin guardar su contenido completo.
+El corpus requiere más que el texto. Cada documento tiene una clase,
+sensibilidad, procedencia y una o varias versiones. La versión conserva la ruta
+relativa, el nombre, el tipo MIME, el tamaño y el checksum SHA-256 del archivo.
+Así se verifica su identidad sin guardar el contenido completo en la base.
 
-Cada versión se divide en fragmentos. El fragmento es la unidad que se vectoriza y también la unidad que luego se puede mostrar como evidencia. Esto permite indicar con precisión qué sección de qué versión fue utilizada para fundamentar una respuesta, en lugar de asociar la respuesta a un documento completo.
+Cada versión se divide en fragmentos. El fragmento es la unidad vectorizada y
+la que se muestra como evidencia. Así se identifica la sección y la versión que
+sostuvieron una respuesta, en lugar de señalar el documento completo.
 
-Cada perfil puede ver un conjunto distinto de clases documentales. El permiso se modela como una relación entre perfil y clase, y la ausencia de esa relación significa denegación. Los datos de interacción y auditoría registran quién consultó, con qué perfil, qué resultado obtuvo y qué evidencia se utilizó, sin duplicar el contenido sensible de los documentos.
+Cada perfil puede ver distintas clases documentales. El permiso relaciona un
+perfil con una clase; si la relación no existe, el acceso se deniega. La
+interacción y la auditoría registran quién consultó, con qué perfil, qué obtuvo
+y qué evidencia se usó, sin copiar contenido sensible.
 
-Para la implementación usamos datos sintéticos. Esto evita trabajar con datos personales, comerciales o documentos internos reales y permite repetir la carga con los mismos conteos, archivos, vectores y resultados esperados.
+Se usan datos sintéticos para no exponer información personal, comercial ni
+documentos internos. La misma carga se puede repetir con iguales conteos,
+archivos, vectores y resultados esperados.

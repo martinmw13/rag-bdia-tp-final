@@ -24,6 +24,7 @@ practica/
 
 # Local agent guidance (not part of the academic deliverables)
 /AGENTS.md
+/GUIA_DE_VOZ.md
 /CLAUDE.md
 /CLAUDE.local.md
 /.claude/
