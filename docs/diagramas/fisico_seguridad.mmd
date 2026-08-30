@@ -1,0 +1,87 @@
+%% Modelo físico - seguridad, interacción, evidencia y auditoría
+%% Los mecanismos RLS, triggers y privilegios se resumen en fisico_notas.md.
+erDiagram
+    PERFIL_AUTORIZADO {
+        bigint id PK
+        text codigo UK
+        boolean activo
+    }
+    ACTOR {
+        bigint id PK "UNIQUE con perfil_autorizado_id"
+        text codigo UK
+        bigint perfil_autorizado_id FK "UNIQUE con id"
+        boolean activo
+    }
+    CLASE_DOCUMENTAL {
+        bigint id PK
+    }
+    PERMISO_DOCUMENTAL {
+        bigint perfil_id PK,FK
+        bigint clase_id PK,FK
+    }
+    CONSULTA {
+        bigint id PK
+        bigint actor_id FK
+        bigint perfil_efectivo_id FK
+        text pregunta
+        timestamptz instante
+    }
+    RESPUESTA {
+        bigint id PK
+        bigint consulta_id FK,UK
+        text tipo_resultado
+        text contenido
+        timestamptz instante
+    }
+    EMBEDDING {
+        bigint id PK
+    }
+    RESULTADO_ESTRUCTURADO {
+        bigint id PK
+        text tipo_consulta
+        jsonb parametros
+        jsonb contenido
+        timestamptz generado_en
+        text hash
+    }
+    EVIDENCIA_DOCUMENTAL {
+        bigint id PK
+        bigint respuesta_id FK "UNIQUE con embedding_id y con ranking"
+        bigint embedding_id FK "UNIQUE con respuesta_id"
+        integer ranking "UNIQUE con respuesta_id"
+        numeric_10_8 score
+    }
+    EVIDENCIA_ESTRUCTURADA {
+        bigint id PK
+        bigint respuesta_id FK "UNIQUE con resultado_id"
+        bigint resultado_estructurado_id FK "UNIQUE con respuesta_id"
+    }
+    EVENTO_AUDITORIA {
+        bigint id PK
+        bigint actor_id FK
+        bigint perfil_efectivo_id FK
+        timestamptz instante
+        text accion
+        text resultado
+        text recurso_tipo
+        bigint recurso_id
+        bigint consulta_id FK
+        bigint respuesta_id FK
+        integer ranking
+        numeric_10_8 score
+        jsonb detalles
+    }
+
+    PERFIL_AUTORIZADO ||--o{ ACTOR : perfil_asignado
+    PERFIL_AUTORIZADO ||--o{ PERMISO_DOCUMENTAL : perfil_id
+    CLASE_DOCUMENTAL ||--o{ PERMISO_DOCUMENTAL : clase_id
+    ACTOR ||--o{ CONSULTA : actor_y_perfil_efectivo
+    CONSULTA ||--o| RESPUESTA : consulta_id
+    RESPUESTA ||--o{ EVIDENCIA_DOCUMENTAL : respuesta_id
+    EMBEDDING ||--o{ EVIDENCIA_DOCUMENTAL : embedding_id
+    RESPUESTA ||--o{ EVIDENCIA_ESTRUCTURADA : respuesta_id
+    RESULTADO_ESTRUCTURADO ||--o{ EVIDENCIA_ESTRUCTURADA : resultado_id
+    ACTOR o|--o{ EVENTO_AUDITORIA : actor_id
+    PERFIL_AUTORIZADO o|--o{ EVENTO_AUDITORIA : perfil_id
+    CONSULTA o|--o{ EVENTO_AUDITORIA : consulta_id
+    RESPUESTA o|--o{ EVENTO_AUDITORIA : respuesta_id

@@ -50,6 +50,29 @@ BEGIN
     END;
 
     BEGIN
+        INSERT INTO entrega (
+            codigo, pedido_id, fecha_programada, fecha_efectiva, estado
+        ) VALUES (
+            'ENT-SIN-FECHA', 1, DATE '2026-07-01', NULL, 'entregada'
+        );
+        RAISE EXCEPTION 'se aceptó una entrega finalizada sin fecha efectiva';
+    EXCEPTION WHEN check_violation THEN
+        NULL;
+    END;
+
+    BEGIN
+        INSERT INTO entrega (
+            codigo, pedido_id, fecha_programada, fecha_efectiva, estado
+        ) VALUES (
+            'ENT-FECHA-ANTICIPADA', 1, DATE '2026-07-01',
+            DATE '2026-07-01', 'en_transito'
+        );
+        RAISE EXCEPTION 'se aceptó una fecha efectiva antes de la entrega';
+    EXCEPTION WHEN check_violation THEN
+        NULL;
+    END;
+
+    BEGIN
         INSERT INTO version_documental (
             documento_id, numero_version, estado, vigente_desde, vigente_hasta,
             publicada_en, ruta_relativa, nombre_archivo, tipo_mime,

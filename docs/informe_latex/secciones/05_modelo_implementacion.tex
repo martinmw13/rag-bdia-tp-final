@@ -1,0 +1,114 @@
+\section{Modelo de implementación según la tecnología elegida}
+
+\subsection{Modelo lógico relacional}
+
+El modelo lógico conserva las tres áreas del modelo conceptual. Reparte las
+tablas, columnas, claves y relaciones entre tres figuras para que puedan leerse
+sin perder la correspondencia con el esquema. Las
+Figuras~\ref{fig:logico-operacion} a~\ref{fig:logico-interaccion} deben leerse
+en conjunto.
+
+\begin{landscape}
+\begin{figure}[p]
+\centering
+\includegraphics[width=0.85\linewidth]{logico_operacion.png}
+\caption{Modelo lógico de la operación comercial y logística.}
+\label{fig:logico-operacion}
+\end{figure}
+\end{landscape}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{logico_documentos_recuperacion.png}
+\caption{Modelo lógico de documentos y recuperación.}
+\label{fig:logico-documentos}
+\end{figure}
+
+\begin{landscape}
+\begin{figure}[p]
+\centering
+\includegraphics[width=0.85\linewidth]{logico_acceso_interaccion_evidencia.png}
+\caption{Modelo lógico de acceso, interacción y evidencia.}
+\label{fig:logico-interaccion}
+\end{figure}
+\end{landscape}
+\FloatBarrier
+
+Las entidades con identidad propia usan claves sustitutas. Los códigos de
+producto, cliente, proveedor, pedido y documento funcionan como claves de
+negocio únicas. Las tablas asociativas usan claves compuestas cuando la pareja
+de referencias identifica la fila. El recorrido documental enlaza
+\texttt{documento}, \texttt{version\_documental}, \texttt{fragmento} y
+\texttt{embedding}; la evidencia conserva la referencia exacta que permite
+reconstruir la fuente de una respuesta.
+\FloatBarrier
+
+\subsection{Modelo físico en PostgreSQL}
+
+El modelo físico describe cómo PostgreSQL materializa el diseño. Las
+Figuras~\ref{fig:fisico-operacion} a~\ref{fig:fisico-seguridad} reparten las
+tablas, los tipos y las restricciones principales entre tres ámbitos. Los
+scripts de \path{db/} siguen siendo la autoridad sobre el comportamiento
+implementado.
+
+\begin{landscape}
+\begin{figure}[p]
+\centering
+\includegraphics[width=0.82\linewidth]{fisico_operacion.png}
+\caption{Implementación física de la operación comercial y logística.}
+\label{fig:fisico-operacion}
+\end{figure}
+\end{landscape}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{fisico_recuperacion.png}
+\caption{Almacenamiento, vigencia y recuperación vectorial en PostgreSQL.}
+\label{fig:fisico-recuperacion}
+\end{figure}
+
+\begin{landscape}
+\begin{figure}[p]
+\centering
+\includegraphics[width=0.85\linewidth]{fisico_seguridad.png}
+\caption{Autorización, evidencia y auditoría en PostgreSQL.}
+\label{fig:fisico-seguridad}
+\end{figure}
+\end{landscape}
+\FloatBarrier
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{@{}lYY@{}}
+\toprule
+Decisión & Implementación & Propósito \\
+\midrule
+Identidad y tiempo & \texttt{BIGINT IDENTITY} y \texttt{TIMESTAMPTZ} &
+Identificar filas y comparar vigencias sin depender de la zona horaria. \\
+Metadatos variables & \texttt{JSONB} &
+Conservar atributos heterogéneos sin trasladar el núcleo relacional a un
+modelo documental. \\
+Vectores & \texttt{VECTOR(32)} e índice HNSW con distancia coseno &
+Ejecutar la prueba de recuperación top-k con vectores sintéticos y
+reproducibles. \\
+Integridad & \texttt{CHECK}, claves foráneas, \texttt{UNIQUE},
+\texttt{EXCLUDE} y triggers diferidos &
+Controlar estados, referencias, vigencias sin solape y reglas que abarcan
+varias filas. \\
+Acceso y trazabilidad & Roles, privilegios, RLS y triggers de auditoría &
+Aplicar permisos antes del ranking y registrar operaciones sin permitir que el
+rol de ejecución altere el historial. \\
+\bottomrule
+\end{tabularx}
+\caption{Principales decisiones del modelo físico.}
+\label{tab:decisiones-fisicas}
+\end{table}
+\FloatBarrier
+
+Los índices B-tree acompañan claves foráneas, filtros y joins usados por las
+consultas representativas. El índice HNSW cubre el acceso vectorial. Los
+intervalos semiabiertos y las restricciones \texttt{EXCLUDE USING gist}
+impiden solapamientos en condiciones comerciales y versiones publicadas. Los
+constraint triggers diferidos comprueban al cierre de la transacción las
+reglas que no pueden expresarse sobre una sola fila.

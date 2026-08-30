@@ -211,7 +211,7 @@ CREATE TABLE entrega (
                       CHECK (estado IN ('planificada', 'en_transito', 'entregada',
                                         'demorada', 'cancelada')),
     CONSTRAINT entrega_fecha_efectiva_ck
-        CHECK (estado <> 'entregada' OR fecha_efectiva IS NOT NULL)
+        CHECK ((estado = 'entregada') = (fecha_efectiva IS NOT NULL))
 );
 
 COMMENT ON TABLE entrega IS

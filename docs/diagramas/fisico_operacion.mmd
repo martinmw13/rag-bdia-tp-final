@@ -1,0 +1,94 @@
+%% Modelo físico - núcleo operativo
+%% Tipos, claves y restricciones principales de db/estructura/01_schema.sql.
+erDiagram
+    CATEGORIA_PRODUCTO {
+        bigint id PK
+        text codigo UK
+        text nombre "NOT NULL"
+        boolean activo
+    }
+    SEGMENTO_CLIENTE {
+        bigint id PK
+        text codigo UK
+        text nombre "NOT NULL"
+        boolean activo
+    }
+    PRODUCTO {
+        bigint id PK
+        text codigo UK
+        text nombre "NOT NULL"
+        text descripcion
+        bigint categoria_id FK
+        boolean activo
+    }
+    CLIENTE {
+        bigint id PK
+        text codigo UK
+        text razon_social "NOT NULL"
+        bigint segmento_id FK
+        boolean activo
+    }
+    PROVEEDOR {
+        bigint id PK
+        text codigo UK
+        text razon_social "NOT NULL"
+        boolean activo
+    }
+    PRODUCTO_PROVEEDOR {
+        bigint producto_id PK,FK
+        bigint proveedor_id PK,FK
+    }
+    CONDICION_COMERCIAL {
+        bigint id PK
+        bigint cliente_id FK
+        bigint producto_id FK
+        numeric_12_2 precio_unitario "CHECK mayor o igual a 0"
+        numeric_5_2 descuento_porcentaje "CHECK entre 0 y 100"
+        date vigente_desde
+        date vigente_hasta "fin abierto; EXCLUDE sin solape"
+    }
+    PEDIDO {
+        bigint id PK
+        text codigo UK
+        bigint cliente_id FK
+        date fecha
+        text estado "CHECK dominio cerrado"
+    }
+    LINEA_PEDIDO {
+        bigint id PK
+        bigint pedido_id FK "UNIQUE con numero_linea y producto_id"
+        integer numero_linea "CHECK mayor a 0"
+        bigint producto_id FK
+        integer cantidad "CHECK mayor a 0"
+        numeric_12_2 precio_unitario "snapshot; CHECK mayor o igual a 0"
+        numeric_5_2 descuento_porcentaje "snapshot; CHECK 0 a 100"
+    }
+    ENTREGA {
+        bigint id PK
+        text codigo UK
+        bigint pedido_id FK
+        date fecha_programada
+        date fecha_efectiva "no nula sólo si entregada"
+        text estado "CHECK dominio cerrado"
+    }
+    INCIDENCIA_OPERATIVA {
+        bigint id PK
+        text codigo UK
+        bigint entrega_id FK
+        date fecha
+        text tipo "CHECK dominio cerrado"
+        text descripcion "NOT NULL"
+        text estado "CHECK dominio cerrado"
+    }
+
+    CATEGORIA_PRODUCTO ||--o{ PRODUCTO : categoria_id
+    SEGMENTO_CLIENTE ||--o{ CLIENTE : segmento_id
+    PRODUCTO ||--o{ PRODUCTO_PROVEEDOR : producto_id
+    PROVEEDOR ||--o{ PRODUCTO_PROVEEDOR : proveedor_id
+    CLIENTE ||--o{ CONDICION_COMERCIAL : cliente_id
+    PRODUCTO ||--o{ CONDICION_COMERCIAL : producto_id
+    CLIENTE ||--o{ PEDIDO : cliente_id
+    PEDIDO ||--|{ LINEA_PEDIDO : pedido_id
+    PRODUCTO ||--o{ LINEA_PEDIDO : producto_id
+    PEDIDO ||--o{ ENTREGA : pedido_id
+    ENTREGA ||--o{ INCIDENCIA_OPERATIVA : entrega_id

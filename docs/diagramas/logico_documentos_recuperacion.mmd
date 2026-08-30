@@ -1,0 +1,90 @@
+%% Modelo lógico: conocimiento documental y recuperación
+%% PRODUCTO y PROVEEDOR son referencias mínimas al ámbito operativo.
+erDiagram
+    CLASE_DOCUMENTAL {
+        integer id PK
+        string codigo UK
+        string nombre
+        string descripcion "opcional"
+        boolean activo "default verdadero"
+    }
+    NIVEL_SENSIBILIDAD {
+        integer id PK
+        string codigo UK
+        string nombre
+        boolean requiere_auditoria "default falso"
+        boolean activo "default verdadero"
+    }
+    DOCUMENTO {
+        integer id PK
+        string codigo UK
+        string titulo
+        integer clase_id FK
+        integer sensibilidad_id FK
+        string procedencia
+        boolean activo "default verdadero"
+    }
+    VERSION_DOCUMENTAL {
+        integer id PK
+        integer documento_id FK
+        integer numero_version UK "positivo; único por documento"
+        string estado "borrador, publicada, sustituida o revocada; gobierna la vigencia"
+        datetime vigente_desde "opcional; publicaciones sin solape por documento"
+        datetime vigente_hasta "opcional; posterior al inicio"
+        datetime publicada_en "opcional; requerida salvo borrador"
+        datetime revocada_en "opcional; presente sólo si revocada"
+        string ruta_relativa
+        string nombre_archivo
+        string tipo_mime
+        integer tamano_bytes "positivo"
+        string sha256 "64 caracteres hexadecimales"
+        json metadatos "default objeto vacío"
+    }
+    FRAGMENTO {
+        integer id PK
+        integer version_id FK
+        integer posicion UK "positiva; única por versión"
+        string titulo
+        string contenido
+        integer pagina "opcional; positiva"
+    }
+    MODELO_EMBEDDING {
+        integer id PK
+        string nombre "unicidad conjunta con version"
+        string version "unicidad conjunta con nombre"
+        integer dimension "positiva"
+        string metrica "coseno, euclidea o producto_interno"
+        boolean activo "default verdadero"
+    }
+    EMBEDDING {
+        integer id PK
+        integer fragmento_id FK,UK "único junto con modelo_id"
+        integer modelo_id FK,UK "único junto con fragmento_id"
+        vector vector
+        datetime generado_en
+    }
+    DOCUMENTO_PRODUCTO {
+        integer documento_id PK,FK
+        integer producto_id PK,FK
+    }
+    DOCUMENTO_PROVEEDOR {
+        integer documento_id PK,FK
+        integer proveedor_id PK,FK
+    }
+    PRODUCTO_REF {
+        integer id PK "referencia al ámbito operativo"
+    }
+    PROVEEDOR_REF {
+        integer id PK "referencia al ámbito operativo"
+    }
+
+    CLASE_DOCUMENTAL ||--o{ DOCUMENTO : clasifica
+    NIVEL_SENSIBILIDAD ||--o{ DOCUMENTO : califica
+    DOCUMENTO ||--o{ VERSION_DOCUMENTAL : conserva
+    VERSION_DOCUMENTAL ||--o{ FRAGMENTO : contiene
+    FRAGMENTO ||--o{ EMBEDDING : representa
+    MODELO_EMBEDDING ||--o{ EMBEDDING : genera
+    DOCUMENTO ||--o{ DOCUMENTO_PRODUCTO : vincula
+    PRODUCTO_REF ||--o{ DOCUMENTO_PRODUCTO : vincula
+    DOCUMENTO ||--o{ DOCUMENTO_PROVEEDOR : vincula
+    PROVEEDOR_REF ||--o{ DOCUMENTO_PROVEEDOR : vincula

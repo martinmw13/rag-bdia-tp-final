@@ -1,93 +1,36 @@
-%% =============================================================================
-%% Arquitectura - Capa de datos para un copiloto RAG interno
-%% =============================================================================
-%% Núcleo único: una instancia de PostgreSQL con pgvector y btree_gist concentra
-%% datos operativos, documentales, vectoriales, de acceso, interacción y
-%% auditoría. No hay frontend, backend, API ni LLM: el copiloto es el contexto
-%% del problema, representado como un consumidor externo fuera de alcance.
-%% El flujo sigue docs/specs/.../impl-modelo-datos.md: generación sintética,
-%% carga, documento/versionado, fragmentación, embeddings, recuperación
-%% autorizada, evidencia y auditoría.
-%% Fuente de autoridad: README.md, db/estructura/, db/indices_vistas/05_seguridad.sql.
-%% =============================================================================
+%% Arquitectura general: un único recorrido de los datos.
+%% La aplicación y el LLM se muestran sólo como contexto y quedan fuera del TP.
 flowchart TD
-    subgraph ORIGEN["Generación y procedencia (fuera de la base)"]
-        GEN["scripts/generar_datos.py<br/>semilla 42 · instante 2026-06-30T15:00:00Z"]
-        DOCS["data/ejemplos/documentos/<br/>14 archivos Markdown"]
-        MANI["data/ejemplos/manifiesto.json<br/>conteos, checksums, oráculos"]
-        GEN --> DOCS
-        GEN --> MANI
-    end
+    GEN["Generador reproducible<br/>scripts/generar_datos.py"]
+    SQL["Seed SQL"]
+    DOCS["Documentos Markdown"]
+    MAN["Manifiesto y checksums"]
 
-    CARGA["scripts/cargar_base.sh<br/>recrea la base, aplica 01→05 y ejecuta las consultas"]
-    GEN --> CARGA
-    DOCS -. "ruta relativa + SHA-256" .-> VD
+    GEN --> SQL
+    GEN --> DOCS
+    GEN --> MAN
 
-    subgraph PG["PostgreSQL 17 · extensiones vector + btree_gist (instancia única)"]
-        direction TB
+    CARGA["Carga y configuración<br/>DDL · índices · RLS · roles"]
+    SQL --> CARGA
+    DOCS -. "ruta + SHA-256" .-> CARGA
+    MAN -. "control reproducible" .-> CARGA
 
-        subgraph OPERATIVO["Núcleo operativo"]
-            PROD["producto · cliente · proveedor"]
-            COND["condicion_comercial"]
-            PED["pedido · linea_pedido"]
-            ENT["entrega · incidencia_operativa"]
-        end
-
-        subgraph DOCUMENTAL["Núcleo documental y vectorial"]
-            DOC["documento"]
-            VD["version_documental<br/>estado + vigencia [desde, hasta)"]
-            FRAG["fragmento<br/>única unidad vectorizada"]
-            EMB["embedding VECTOR(32)<br/>índice HNSW · distancia coseno"]
-            DOC --> VD --> FRAG --> EMB
-        end
-
-        subgraph ACCESO["Acceso"]
-            ACTOR["actor · perfil_autorizado"]
-            PERM["permiso_documental<br/>perfil × clase, denegación por defecto"]
-        end
-
-        VISTA["vista fragmento_recuperable<br/>security_invoker = true"]
-        RLS["RLS sobre documento / version_documental /<br/>fragmento / embedding (FORCE, con propietario incluido)"]
-
-        subgraph INTERACCION["Interacción, evidencia y auditoría"]
-            CONS["consulta"]
-            RESP["respuesta<br/>exito | sin_resultados | sin_fuente_autorizada | acceso_denegado"]
-            EVD["evidencia_documental · evidencia_estructurada"]
-            AUD["evento_auditoria<br/>append-only (trigger + REVOKE)"]
-            CONS --> RESP --> EVD
-            CONS -.-> AUD
-            RESP -.-> AUD
-        end
-
-        FRAG -. "cubierta por" .-> RLS
-        EMB -. "cubierta por" .-> RLS
-        DOC -. "cubierta por" .-> RLS
-        VD -. "cubierta por" .-> RLS
-        RLS -->|"consulta app_clase_autorizada()"| PERM
-        VISTA --> FRAG
-        VISTA --> EMB
-        EMB -.->|"embedding exacto"| EVD
-    end
-
+    PG[("PostgreSQL 17<br/>datos operativos + corpus + pgvector")]
     CARGA --> PG
 
-    subgraph ROLES["Roles técnicos (NOLOGIN, SET ROLE en las pruebas)"]
-        R_ING["rag_ingesta<br/>carga borradores y muestra"]
-        R_DOC["rag_documental<br/>publica / sustituye / revoca"]
-        R_RUN["rag_runtime<br/>no propietario, sin BYPASSRLS<br/>fija rag.actor por transacción"]
-        R_AUD["rag_auditor<br/>solo lectura de auditoría"]
-    end
+    APP["Aplicación / LLM<br/>fuera de alcance"]
+    CONTEXTO["Actor y perfil<br/>contexto transaccional"]
+    REC["Recuperación autorizada<br/>vista + RLS + vigencia + HNSW"]
+    TRAZA["Consulta · respuesta · evidencia"]
+    AUD["Auditoría append-only<br/>funciones y triggers"]
 
-    R_ING -->|INSERT borrador| DOC
-    R_ING -->|"INSERT fragmento"| FRAG
-    R_ING -->|"INSERT embedding"| EMB
-    R_DOC -->|"UPDATE ciclo de vida"| VD
-    R_RUN -->|"SELECT vía RLS"| VISTA
-    R_RUN -->|"INSERT"| CONS
-    R_RUN -->|"INSERT (nunca UPDATE/DELETE)"| AUD
-    R_AUD -->|"SELECT"| AUD
+    CONTEXTO --> PG
+    PG --> REC --> TRAZA
+    TRAZA -. "respuesta fundamentada" .-> APP
+    TRAZA --> AUD
+    PG -. "publicación y revocación" .-> AUD
 
-    COPILOTO["Copiloto / LLM<br/>(fuera de alcance del TP)"]
-    RESP -. "evidencia consumida por" .-> COPILOTO
+    ROLES["Roles técnicos<br/>ingesta · documental · runtime · auditor"]
+    ROLES -. "privilegios mínimos" .-> PG
 
-    style COPILOTO fill:#eee,stroke:#999,color:#666
+    style APP fill:#eee,stroke:#999,color:#666
