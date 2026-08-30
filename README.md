@@ -9,7 +9,7 @@ tres integrantes. La autoría corresponde exclusivamente al grupo.
 
 Como referencia metodológica tomamos el flujo de ingeniería asistida de
 [Matt Pocock](https://github.com/mattpocock/skills), que su autor distingue del
-\"vibe coding\" sin controles. Antes de implementar, organizamos las preguntas
+"vibe coding" sin controles. Antes de implementar, organizamos las preguntas
 abiertas en un mapa compartido, resolvimos cada decisión entre los integrantes,
 consolidamos el resultado en un PRD y contrastamos la implementación con ese
 documento.
@@ -68,8 +68,8 @@ La justificación frente a alternativas NoSQL y a bases vectoriales dedicadas se
 
 ```text
 ├── README.md
-├── latext/                              # Borrador y fuentes del informe técnico
 ├── docs/
+│   ├── informe_latex/                  # Fuentes y PDF de revisión del informe
 │   ├── specs/
 │   │   └── capa-datos-rag-distribuidora/
 │   │       ├── PRD.md                 # Especificación del producto
@@ -245,7 +245,7 @@ tabla de crecimiento continuo más claro.
 
 ## Documentación
 
-- [Borrador del informe técnico en LaTeX](latext/README.md)
+- [Borrador del informe técnico en LaTeX](docs/informe_latex/README.md)
 - [Especificación del producto](docs/specs/capa-datos-rag-distribuidora/PRD.md)
 - [Especificaciones de implementación](docs/specs/capa-datos-rag-distribuidora/)
 - Diagramas: [conceptual](docs/modelo_conceptual.png), [lógico](docs/modelo_logico_o_equivalente.png), [físico](docs/modelo_fisico_o_equivalente.png) y [arquitectura](docs/arquitectura.png); [fuentes Mermaid](docs/diagramas/)

@@ -7,7 +7,7 @@ el artefacto que lo implementa y la evidencia que lo demuestra. Funciona como
 implementación o el informe. La columna "Sección del informe" señala dónde se
 desarrolla cada punto en el borrador LaTeX actual.
 
-> El proyecto fuente y su PDF de revisión están en [`latext/`](../latext/).
+> El proyecto fuente y su PDF de revisión están en [`docs/informe_latex/`](informe_latex/).
 > Cuando concluya la revisión académica, el PDF definitivo se publicará como
 > `docs/informe.pdf`.
 
@@ -27,7 +27,7 @@ desarrolla cada punto en el borrador LaTeX actual.
 | Datos sintéticos, reproducibles, sin datos reales ni licencias externas | [`scripts/generar_datos.py`](../scripts/generar_datos.py), [`data/ejemplos/manifiesto.json`](../data/ejemplos/manifiesto.json) | README §"Reproducibilidad" | Datos sintéticos y reproducibilidad |
 | Clasificación estructurada / semiestructurada / no estructurada / operacional / analítica / sensible / auditoría | [`nosql/modelo_nosql.md`](../nosql/modelo_nosql.md), [`vectorial/modelo_vectorial.md`](../vectorial/modelo_vectorial.md) | — (análisis, no ejecutable) | Clasificación de los datos |
 | Sólo se vectorizan fragmentos documentales; hechos operativos como datos estructurados | [`vectorial/modelo_vectorial.md`](../vectorial/modelo_vectorial.md) §"Qué se vectoriza" | Consultas 1–5 vs. 6–7 en `db/consultas/` | Clasificación de los datos |
-| Documentos con procedencia, versión, vigencia, sensibilidad e integridad verificable | `documento`, `version_documental` en [`01_schema.sql`](../db/estructura/01_schema.sql) | [`docs/diagramas/fisico.mmd`](diagramas/fisico.mmd) | Modelo documental |
+| Documentos con procedencia, versión, vigencia, sensibilidad e integridad verificable | `documento`, `version_documental` en [`01_schema.sql`](../db/estructura/01_schema.sql) | [`docs/diagramas/fisico_recuperacion.mmd`](diagramas/fisico_recuperacion.mmd) | Modelo documental |
 
 ## Vigencia y autorización
 
@@ -51,7 +51,7 @@ desarrolla cada punto en el borrador LaTeX actual.
 
 | Requisito | Artefacto | Evidencia | Sección del informe (propuesta) |
 | --- | --- | --- | --- |
-| Modelos conceptual, lógico y físico con relaciones, cardinalidades y restricciones | [`docs/diagramas/conceptual.mmd`](diagramas/conceptual.mmd), [`logico.mmd`](diagramas/logico.mmd), [`fisico.mmd`](diagramas/fisico.mmd) + [`fisico_notas.md`](diagramas/fisico_notas.md) | Correspondencia 1:1 con [`01_schema.sql`](../db/estructura/01_schema.sql) | Modelo de datos |
+| Modelos conceptual, lógico y físico con relaciones, cardinalidades y restricciones | Vistas índice y temáticas en [`docs/diagramas/`](diagramas/), más [`fisico_notas.md`](diagramas/fisico_notas.md) | Correspondencia con [`01_schema.sql`](../db/estructura/01_schema.sql) y los scripts de índices y seguridad | Modelo de datos |
 | Implementación mínima: estructuras, datos, índices, controles de acceso, consultas | `db/estructura/`, `db/datos/`, `db/indices_vistas/`, `db/consultas/` | [`scripts/cargar_base.sh`](../scripts/cargar_base.sh) ejecuta las cinco fases en orden | Implementación |
 | Al menos cinco consultas de negocio y recuperación; conjunto acordado de nueve | [`04_consultas.sql`](../db/consultas/04_consultas.sql) (1–6), [`06_consultas_seguridad.sql`](../db/consultas/06_consultas_seguridad.sql) (7–9) | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) | Consultas representativas |
 | Resultados repetibles tras dos cargas limpias equivalentes | Semilla `42`, instante `2026-06-30T15:00:00Z` en [`generar_datos.py`](../scripts/generar_datos.py) | [`validar_base.sh`](../scripts/validar_base.sh) compara snapshots ordenados | Reproducibilidad |
@@ -118,16 +118,16 @@ desarrolla cada punto en el borrador LaTeX actual.
 
 | Tema | Sección del informe | Estado |
 | --- | --- | --- |
-| Caso de uso, usuarios, riesgos y relevamiento de datos | [`01_caso_uso.tex`](../latext/secciones/01_caso_uso.tex), [`02_relevamiento_datos.tex`](../latext/secciones/02_relevamiento_datos.tex) | Cubierto |
-| Clasificación de datos | [`03_clasificacion_datos.tex`](../latext/secciones/03_clasificacion_datos.tex) | Cubierto |
-| Modelos conceptual, lógico y físico | [`04_modelo_conceptual.tex`](../latext/secciones/04_modelo_conceptual.tex), [`05_modelo_implementacion.tex`](../latext/secciones/05_modelo_implementacion.tex) | Cubierto; incluye los diagramas renderizados |
-| Normalización, JSONB, embebido y referencias | [`06_decisiones_diseno.tex`](../latext/secciones/06_decisiones_diseno.tex) | Cubierto |
-| Selección y justificación tecnológica | [`07_justificacion_tecnologica.tex`](../latext/secciones/07_justificacion_tecnologica.tex) | Cubierto |
-| Implementación mínima, datos y consultas | [`08_implementacion_minima.tex`](../latext/secciones/08_implementacion_minima.tex), [`09_datos_ejemplo.tex`](../latext/secciones/09_datos_ejemplo.tex), [`10_consultas_representativas.tex`](../latext/secciones/10_consultas_representativas.tex) | Cubierto |
-| Datos vectoriales y recuperación autorizada | [`11_datos_vectoriales.tex`](../latext/secciones/11_datos_vectoriales.tex) | Cubierto |
-| Arquitectura general y recorrido de datos | [`12_arquitectura_datos.tex`](../latext/secciones/12_arquitectura_datos.tex) | Cubierto |
-| Roles, permisos, aislamiento y auditoría | [`13_seguridad_aislamiento.tex`](../latext/secciones/13_seguridad_aislamiento.tex) | Cubierto |
-| Rendimiento, escalabilidad y conclusiones | [`14_escalabilidad_rendimiento.tex`](../latext/secciones/14_escalabilidad_rendimiento.tex), [`15_conclusiones.tex`](../latext/secciones/15_conclusiones.tex) | Cubierto |
+| Caso de uso, usuarios, riesgos y relevamiento de datos | [`01_caso_uso.tex`](informe_latex/secciones/01_caso_uso.tex), [`02_relevamiento_datos.tex`](informe_latex/secciones/02_relevamiento_datos.tex) | Cubierto |
+| Clasificación de datos | [`03_clasificacion_datos.tex`](informe_latex/secciones/03_clasificacion_datos.tex) | Cubierto |
+| Modelos conceptual, lógico y físico | [`04_modelo_conceptual.tex`](informe_latex/secciones/04_modelo_conceptual.tex), [`05_modelo_implementacion.tex`](informe_latex/secciones/05_modelo_implementacion.tex) | Cubierto; incluye los diagramas renderizados |
+| Normalización, JSONB, embebido y referencias | [`06_decisiones_diseno.tex`](informe_latex/secciones/06_decisiones_diseno.tex) | Cubierto |
+| Selección y justificación tecnológica | [`07_justificacion_tecnologica.tex`](informe_latex/secciones/07_justificacion_tecnologica.tex) | Cubierto |
+| Implementación mínima, datos y consultas | [`08_implementacion_minima.tex`](informe_latex/secciones/08_implementacion_minima.tex), [`09_datos_ejemplo.tex`](informe_latex/secciones/09_datos_ejemplo.tex), [`10_consultas_representativas.tex`](informe_latex/secciones/10_consultas_representativas.tex) | Cubierto |
+| Datos vectoriales y recuperación autorizada | [`11_datos_vectoriales.tex`](informe_latex/secciones/11_datos_vectoriales.tex) | Cubierto |
+| Arquitectura general y recorrido de datos | [`12_arquitectura_datos.tex`](informe_latex/secciones/12_arquitectura_datos.tex) | Cubierto |
+| Roles, permisos, aislamiento y auditoría | [`13_seguridad_aislamiento.tex`](informe_latex/secciones/13_seguridad_aislamiento.tex) | Cubierto |
+| Rendimiento, escalabilidad y conclusiones | [`14_escalabilidad_rendimiento.tex`](informe_latex/secciones/14_escalabilidad_rendimiento.tex), [`15_conclusiones.tex`](informe_latex/secciones/15_conclusiones.tex) | Cubierto |
 
 El único paso editorial pendiente es publicar el PDF definitivo en
 `docs/informe.pdf` una vez concluida la revisión académica. Las fuentes Mermaid
