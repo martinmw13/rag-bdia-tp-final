@@ -24,9 +24,8 @@ similitud.
 ## Estructura del elemento vectorizado
 
 El texto que compone el vector combina **título del documento + encabezado de
-la sección + contenido del cuerpo** (contrato fijado en
-`docs/specs/capa-datos-rag-distribuidora/impl-datos-sinteticos.md`, sección
-"Documentos y fragmentación"). `fragmento.contenido` almacena sólo el cuerpo
+la sección + contenido del cuerpo**. Este criterio está implementado por el
+generador del conjunto sintético. `fragmento.contenido` almacena sólo el cuerpo
 propio de la sección, sin el texto combinado, porque el contenido debe
 poder mostrarse como evidencia sin repetir el título en cada fragmento
 recuperado; el texto combinado es un artefacto de construcción del vector,
