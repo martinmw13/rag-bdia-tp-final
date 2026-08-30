@@ -1,20 +1,20 @@
 # Capa de datos para un copiloto RAG interno de una distribuidora mayorista
 
-## Uso responsable de IA
+## Uso de IA
 
-¡Hola, profe! En este trabajo usamos IA para explorar alternativas, revisar la
-consistencia y automatizar tareas mecánicas. Los tres integrantes discutimos y
-aprobamos las decisiones de dominio, alcance, modelado y validación.
+Hola profe! En este trabajo usamos IA como apoyo para explorar alternativas y definir el diseño del proyecto.
+Las decisiones de dominio, alcance, modelado y validación fueron discutidas y aprobadas por los
+tres integrantes.
 
 Como referencia metodológica tomamos el flujo de
-[Matt Pocock](https://github.com/mattpocock/skills), que está buenísimo. Antes de
-implementar, ordenamos las preguntas abiertas en un mapa, resolvimos cada
-decisión y pasamos el resultado a un PRD. Después contrastamos la implementación
-con ese documento.
+[Matt Pocock](https://github.com/mattpocock/skills), esta buenisimo. Antes de implementar, organizamos las preguntas
+abiertas en un mapa compartido, resolvimos cada decisión,
+consolidamos el resultado en un PRD y contrastamos la implementación con ese
+documento.
 
 La trazabilidad del proceso se puede ver en:
 
-- [Mapa de decisiones: issue #1](https://github.com/martinmw13/rag-bdia-tp-final/issues/1), con enlaces a las diez decisiones resueltas.
+- [Mapa de decisiones: issue #1](https://github.com/martinmw13/rag-bdia-tp-final/issues/1), con enlaces a las diez decisiones resueltas como subissues.
 - [PRD final](docs/specs/capa-datos-rag-distribuidora/PRD.md)
 
 **Trabajo Práctico Integrador — Bases de Datos para Inteligencia Artificial**
@@ -72,10 +72,6 @@ interacciones y auditoría.
 Los archivos quedan fuera de la base y se vinculan por ruta relativa, tipo MIME,
 tamaño y SHA-256.
 
-La comparación con alternativas NoSQL y vectoriales está en
-[`nosql/modelo_nosql.md`](nosql/modelo_nosql.md) y
-[`vectorial/modelo_vectorial.md`](vectorial/modelo_vectorial.md).
-
 ## Estructura del repositorio
 
 ```text
@@ -106,7 +102,6 @@ La comparación con alternativas NoSQL y vectoriales está en
 │       ├── 04_consultas.sql           # Consultas funcionales 1 a 6
 │       ├── 06_consultas_seguridad.sql # Consulta 7 y pruebas 8 y 9
 │       └── 07_validaciones.sql        # Aserciones automáticas
-├── nosql/modelo_nosql.md              # Análisis de alternativas NoSQL
 ├── vectorial/modelo_vectorial.md      # Modelo de datos vectorial
 ├── evidencias/
 │   ├── planes_ejecucion.md            # Planes reales y su interpretación
@@ -265,5 +260,4 @@ mover los archivos a almacenamiento de objetos y particionar
 - [Especificaciones de implementación](docs/specs/capa-datos-rag-distribuidora/)
 - Diagramas: [conceptual](docs/modelo_conceptual.png), [lógico](docs/modelo_logico_o_equivalente.png), [físico](docs/modelo_fisico_o_equivalente.png) y [arquitectura](docs/arquitectura.png); [fuentes Mermaid](docs/diagramas/)
 - [Matriz de cobertura](docs/matriz_cobertura.md)
-- [Análisis de alternativas NoSQL](nosql/modelo_nosql.md)
 - [Modelo de datos vectorial](vectorial/modelo_vectorial.md)

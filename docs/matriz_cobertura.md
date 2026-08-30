@@ -25,7 +25,7 @@ desarrolla cada punto en el borrador LaTeX actual.
 | Requisito | Artefacto | Evidencia | Sección del informe (propuesta) |
 | --- | --- | --- | --- |
 | Datos sintéticos, reproducibles, sin datos reales ni licencias externas | [`scripts/generar_datos.py`](../scripts/generar_datos.py), [`data/ejemplos/manifiesto.json`](../data/ejemplos/manifiesto.json) | README §"Reproducibilidad" | Datos sintéticos y reproducibilidad |
-| Clasificación estructurada / semiestructurada / no estructurada / operacional / analítica / sensible / auditoría | [`nosql/modelo_nosql.md`](../nosql/modelo_nosql.md), [`vectorial/modelo_vectorial.md`](../vectorial/modelo_vectorial.md) | — (análisis, no ejecutable) | Clasificación de los datos |
+| Clasificación estructurada / semiestructurada / no estructurada / operacional / analítica / sensible / auditoría | [`03_clasificacion_datos.tex`](informe_latex/secciones/03_clasificacion_datos.tex), [`vectorial/modelo_vectorial.md`](../vectorial/modelo_vectorial.md) | — (análisis, no ejecutable) | Clasificación de los datos |
 | Sólo se vectorizan fragmentos documentales; hechos operativos como datos estructurados | [`vectorial/modelo_vectorial.md`](../vectorial/modelo_vectorial.md) §"Qué se vectoriza" | Consultas 1–5 vs. 6–7 en `db/consultas/` | Clasificación de los datos |
 | Documentos con procedencia, versión, vigencia, sensibilidad e integridad verificable | `documento`, `version_documental` en [`01_schema.sql`](../db/estructura/01_schema.sql) | [`docs/diagramas/fisico_recuperacion.mmd`](diagramas/fisico_recuperacion.mmd) | Modelo documental |
 
@@ -70,7 +70,7 @@ desarrolla cada punto en el borrador LaTeX actual.
 | Requisito | Artefacto | Evidencia | Sección del informe (propuesta) |
 | --- | --- | --- | --- |
 | Separación futura de almacenamiento de archivos e ingesta | README §"Limitaciones y posibles mejoras" | — (análisis, no implementado) | Evolución y trabajo futuro |
-| Réplicas de lectura y particionamiento temporal para tablas de crecimiento continuo | README §"Limitaciones y posibles mejoras"; [`nosql/modelo_nosql.md`](../nosql/modelo_nosql.md) §"Base columnar" | — (análisis, no implementado) | Evolución y trabajo futuro |
+| Réplicas de lectura y particionamiento temporal para tablas de crecimiento continuo | README §"Limitaciones y posibles mejoras"; [`14_escalabilidad_rendimiento.tex`](informe_latex/secciones/14_escalabilidad_rendimiento.tex) | — (análisis, no implementado) | Evolución y trabajo futuro |
 | Métricas operativas adicionales, sin ampliar el dataset ni volverlo benchmark | No ejercido | — | Evolución y trabajo futuro (mención de alcance) |
 
 ## Reglas de negocio
