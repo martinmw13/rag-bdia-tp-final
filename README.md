@@ -15,9 +15,7 @@ documento.
 La trazabilidad del proceso se puede ver en:
 
 - [Mapa de decisiones: issue #1](https://github.com/martinmw13/rag-bdia-tp-final/issues/1), con enlaces a las diez decisiones resueltas.
-- [Decisión sobre la organización de entregables: issue #11](https://github.com/martinmw13/rag-bdia-tp-final/issues/11).
-- [PRD final](docs/specs/capa-datos-rag-distribuidora/PRD.md) y [PR #23](https://github.com/martinmw13/rag-bdia-tp-final/pull/23), que eliminó la copia duplicada.
-- [Matriz de cobertura](docs/matriz_cobertura.md), que vincula consigna, informe, implementación y evidencia.
+- [PRD final](docs/specs/capa-datos-rag-distribuidora/PRD.md)
 
 **Trabajo Práctico Integrador — Bases de Datos para Inteligencia Artificial**
 Carrera de Especialización en Inteligencia Artificial
