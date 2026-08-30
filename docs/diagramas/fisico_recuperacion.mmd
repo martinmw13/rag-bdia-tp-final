@@ -1,0 +1,90 @@
+%% Modelo físico - almacenamiento, vigencia y recuperación vectorial
+%% Se muestran las columnas que materializan las decisiones de PostgreSQL.
+erDiagram
+    CLASE_DOCUMENTAL {
+        bigint id PK
+        text codigo UK
+        text nombre
+        text descripcion
+        boolean activo
+    }
+    NIVEL_SENSIBILIDAD {
+        bigint id PK
+        text codigo UK
+        text nombre
+        boolean requiere_auditoria
+        boolean activo
+    }
+    DOCUMENTO {
+        bigint id PK
+        text codigo UK
+        text titulo
+        bigint clase_id FK
+        bigint sensibilidad_id FK
+        text procedencia
+        boolean activo
+    }
+    VERSION_DOCUMENTAL {
+        bigint id PK
+        bigint documento_id FK "UNIQUE con numero_version"
+        integer numero_version "UNIQUE con documento_id"
+        text estado
+        timestamptz vigente_desde
+        timestamptz vigente_hasta
+        timestamptz publicada_en
+        timestamptz revocada_en
+        text ruta_relativa
+        text nombre_archivo
+        text tipo_mime
+        bigint tamano_bytes
+        text sha256
+        jsonb metadatos
+    }
+    FRAGMENTO {
+        bigint id PK
+        bigint version_id FK "UNIQUE con posicion"
+        integer posicion "UNIQUE con version_id"
+        text titulo
+        text contenido
+        integer pagina
+    }
+    MODELO_EMBEDDING {
+        bigint id PK
+        text nombre "UNIQUE con version"
+        text version "UNIQUE con nombre"
+        integer dimension
+        text metrica
+        boolean activo
+    }
+    EMBEDDING {
+        bigint id PK
+        bigint fragmento_id FK "UNIQUE con modelo_id"
+        bigint modelo_id FK "UNIQUE con fragmento_id"
+        vector_32 vector
+        timestamptz generado_en
+    }
+    DOCUMENTO_PRODUCTO {
+        bigint documento_id PK,FK
+        bigint producto_id PK,FK
+    }
+    DOCUMENTO_PROVEEDOR {
+        bigint documento_id PK,FK
+        bigint proveedor_id PK,FK
+    }
+    PRODUCTO_REF {
+        bigint id PK "referencia al núcleo operativo"
+    }
+    PROVEEDOR_REF {
+        bigint id PK "referencia al núcleo operativo"
+    }
+
+    CLASE_DOCUMENTAL ||--o{ DOCUMENTO : clase_id
+    NIVEL_SENSIBILIDAD ||--o{ DOCUMENTO : sensibilidad_id
+    DOCUMENTO ||--o{ VERSION_DOCUMENTAL : documento_id
+    VERSION_DOCUMENTAL ||--o{ FRAGMENTO : version_id
+    FRAGMENTO ||--o{ EMBEDDING : fragmento_id
+    MODELO_EMBEDDING ||--o{ EMBEDDING : modelo_id
+    DOCUMENTO ||--o{ DOCUMENTO_PRODUCTO : documento_id
+    PRODUCTO_REF ||--o{ DOCUMENTO_PRODUCTO : producto_id
+    DOCUMENTO ||--o{ DOCUMENTO_PROVEEDOR : documento_id
+    PROVEEDOR_REF ||--o{ DOCUMENTO_PROVEEDOR : proveedor_id

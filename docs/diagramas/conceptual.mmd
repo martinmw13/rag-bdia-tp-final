@@ -1,48 +1,10 @@
-%% =============================================================================
-%% Modelo conceptual - Capa de datos para un copiloto RAG interno
-%% =============================================================================
-%% Entidades y relaciones de negocio, sin atributos ni tipos físicos. Agrupado
-%% por ámbito según docs/specs/capa-datos-rag-distribuidora/PRD.md:
-%% operativo, documental/vectorial, acceso e interacción/evidencia/auditoría.
-%% Fuente de autoridad de las entidades y cardinalidades: db/estructura/01_schema.sql.
-%% =============================================================================
-erDiagram
-    %% --- Catálogos -----------------------------------------------------------
-    CATEGORIA_PRODUCTO ||--o{ PRODUCTO : clasifica
-    SEGMENTO_CLIENTE   ||--o{ CLIENTE  : agrupa
-    PERFIL_AUTORIZADO  ||--o{ ACTOR    : "es asumido por"
-    CLASE_DOCUMENTAL   ||--o{ DOCUMENTO : clasifica
-    NIVEL_SENSIBILIDAD ||--o{ DOCUMENTO : califica
-    MODELO_EMBEDDING   ||--o{ EMBEDDING : genera
+%% Modelo conceptual: mapa general
+%% Cada bloque se desarrolla en una figura independiente.
+flowchart LR
+    O["Operación comercial y logística<br/>catálogo · clientes · pedidos · entregas"]
+    D["Conocimiento documental y recuperación<br/>documentos · versiones · fragmentos · embeddings"]
+    A["Acceso, interacción y evidencia<br/>perfiles · consultas · respuestas · auditoría"]
 
-    %% --- Núcleo operativo ------------------------------------------------------
-    CLIENTE   ||--o{ PEDIDO             : realiza
-    PEDIDO    ||--|{ LINEA_PEDIDO       : contiene
-    PRODUCTO  ||--o{ LINEA_PEDIDO       : "es pedido en"
-    CLIENTE   ||--o{ CONDICION_COMERCIAL : negocia
-    PRODUCTO  ||--o{ CONDICION_COMERCIAL : "es objeto de"
-    PEDIDO    ||--o{ ENTREGA            : origina
-    ENTREGA   ||--o{ INCIDENCIA_OPERATIVA : registra
-    PRODUCTO  }o--o{ PROVEEDOR          : "es abastecido por"
-
-    %% --- Núcleo documental y vectorial -----------------------------------------
-    DOCUMENTO          ||--|{ VERSION_DOCUMENTAL : tiene
-    VERSION_DOCUMENTAL ||--|{ FRAGMENTO           : "se divide en"
-    FRAGMENTO          ||--o{ EMBEDDING           : vectoriza
-    DOCUMENTO          }o--o{ PRODUCTO            : referencia
-    DOCUMENTO          }o--o{ PROVEEDOR           : referencia
-
-    %% --- Acceso -----------------------------------------------------------------
-    PERFIL_AUTORIZADO }o--o{ CLASE_DOCUMENTAL : autoriza
-
-    %% --- Interacción, evidencia y auditoría -------------------------------------
-    ACTOR              ||--o{ CONSULTA             : formula
-    PERFIL_AUTORIZADO  ||--o{ CONSULTA             : "resuelve como perfil efectivo"
-    CONSULTA           ||--o| RESPUESTA            : origina
-    RESPUESTA          ||--o{ EVIDENCIA_DOCUMENTAL : sostiene
-    EMBEDDING          ||--o{ EVIDENCIA_DOCUMENTAL : "es referenciado por"
-    RESPUESTA          ||--o{ EVIDENCIA_ESTRUCTURADA : sostiene
-    RESULTADO_ESTRUCTURADO ||--o{ EVIDENCIA_ESTRUCTURADA : "es referenciado por"
-    ACTOR              |o--o{ EVENTO_AUDITORIA     : origina
-    CONSULTA           |o--o{ EVENTO_AUDITORIA     : correlaciona
-    RESPUESTA          |o--o{ EVENTO_AUDITORIA     : correlaciona
+    O -->|"aporta registros y contexto"| A
+    O <-->|"vincula productos y proveedores"| D
+    D -->|"aporta fuentes autorizadas"| A

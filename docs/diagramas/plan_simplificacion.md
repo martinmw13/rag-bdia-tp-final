@@ -1,6 +1,6 @@
 # Simplificación de los diagramas del informe
 
-Estado: en diseño.
+Estado: implementado y validado.
 
 ## Objetivo
 
@@ -34,8 +34,8 @@ reproducir en una sola lámina todas las columnas del esquema.
   manifiesto.
 - Reservar el estado de borrador para la versión documental.
 
-## Decisión pendiente
+## Regla de entrega
 
-Definir si `fecha_efectiva` debe ser nula para todos los estados de una entrega
-excepto `entregada`. Si se adopta esa regla, habrá que ajustar el esquema y sus
-pruebas además de los diagramas.
+`fecha_efectiva` debe ser nula para todos los estados de una entrega excepto
+`entregada`. El esquema, sus validaciones y los diagramas deben expresar los dos
+sentidos de esta regla.

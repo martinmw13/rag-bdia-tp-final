@@ -1,0 +1,94 @@
+%% Modelo lógico: operación comercial y logística
+%% Tipos independientes del motor. Los atributos son obligatorios salvo indicación.
+erDiagram
+    CATEGORIA_PRODUCTO {
+        integer id PK
+        string codigo UK
+        string nombre
+        boolean activo "default verdadero"
+    }
+    SEGMENTO_CLIENTE {
+        integer id PK
+        string codigo UK
+        string nombre
+        boolean activo "default verdadero"
+    }
+    PRODUCTO {
+        integer id PK
+        string codigo UK
+        string nombre
+        string descripcion "opcional"
+        integer categoria_id FK
+        boolean activo "default verdadero"
+    }
+    CLIENTE {
+        integer id PK
+        string codigo UK
+        string razon_social
+        integer segmento_id FK
+        boolean activo "default verdadero"
+    }
+    PROVEEDOR {
+        integer id PK
+        string codigo UK
+        string razon_social
+        boolean activo "default verdadero"
+    }
+    PRODUCTO_PROVEEDOR {
+        integer producto_id PK,FK
+        integer proveedor_id PK,FK
+    }
+    CONDICION_COMERCIAL {
+        integer id PK
+        integer cliente_id FK
+        integer producto_id FK
+        decimal precio_unitario "mayor o igual que 0"
+        decimal descuento_porcentaje "entre 0 y 100; default 0"
+        date vigente_desde "sin solapamientos por cliente y producto"
+        date vigente_hasta "opcional; posterior a vigente_desde"
+    }
+    PEDIDO {
+        integer id PK
+        string codigo UK
+        integer cliente_id FK
+        date fecha
+        string estado "pendiente, en_preparacion, entregado o cancelado"
+    }
+    LINEA_PEDIDO {
+        integer id PK
+        integer pedido_id FK
+        integer numero_linea UK "positivo; único por pedido"
+        integer producto_id FK,UK "único por pedido"
+        integer cantidad "positiva"
+        decimal precio_unitario "mayor o igual que 0; snapshot"
+        decimal descuento_porcentaje "entre 0 y 100; snapshot"
+    }
+    ENTREGA {
+        integer id PK
+        string codigo UK
+        integer pedido_id FK
+        date fecha_programada
+        date fecha_efectiva "presente si y sólo si estado = entregada"
+        string estado "planificada, en_transito, entregada, demorada o cancelada"
+    }
+    INCIDENCIA_OPERATIVA {
+        integer id PK
+        string codigo UK
+        integer entrega_id FK
+        date fecha
+        string tipo "demora, faltante, dano, direccion_erronea u otro"
+        string descripcion
+        string estado "abierta, en_revision o cerrada"
+    }
+
+    CATEGORIA_PRODUCTO ||--o{ PRODUCTO : clasifica
+    SEGMENTO_CLIENTE ||--o{ CLIENTE : agrupa
+    PRODUCTO ||--o{ PRODUCTO_PROVEEDOR : vincula
+    PROVEEDOR ||--o{ PRODUCTO_PROVEEDOR : vincula
+    CLIENTE ||--o{ CONDICION_COMERCIAL : acuerda
+    PRODUCTO ||--o{ CONDICION_COMERCIAL : aplica_a
+    CLIENTE ||--o{ PEDIDO : realiza
+    PEDIDO ||--|{ LINEA_PEDIDO : contiene
+    PRODUCTO ||--o{ LINEA_PEDIDO : solicitado_en
+    PEDIDO ||--o{ ENTREGA : origina
+    ENTREGA ||--o{ INCIDENCIA_OPERATIVA : registra

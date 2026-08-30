@@ -1,0 +1,53 @@
+%% Modelo conceptual: conocimiento documental y recuperación
+%% Una versión puede no tener fragmentos mientras se encuentra en preparación.
+erDiagram
+    CLASE_DOCUMENTAL {
+        string codigo
+        string nombre
+    }
+    NIVEL_SENSIBILIDAD {
+        string codigo
+        boolean requiere_auditoria
+    }
+    DOCUMENTO {
+        string codigo
+        string titulo
+        string procedencia
+        boolean activo
+    }
+    VERSION_DOCUMENTAL {
+        integer numero_version "único por documento"
+        string estado "borrador, publicada, sustituida o revocada"
+        datetime vigencia "sin solapamientos entre publicaciones"
+        string archivo_original "uno por versión"
+    }
+    FRAGMENTO {
+        integer posicion "única dentro de la versión"
+        string titulo
+        string contenido
+    }
+    MODELO_EMBEDDING {
+        string nombre_y_version "combinación única"
+        integer dimension
+        string metrica
+        boolean activo
+    }
+    EMBEDDING {
+        vector representacion "uno por fragmento y modelo"
+        datetime generado_en
+    }
+    PRODUCTO {
+        string codigo
+    }
+    PROVEEDOR {
+        string codigo
+    }
+
+    CLASE_DOCUMENTAL ||--o{ DOCUMENTO : clasifica
+    NIVEL_SENSIBILIDAD ||--o{ DOCUMENTO : califica
+    DOCUMENTO ||--o{ VERSION_DOCUMENTAL : conserva
+    VERSION_DOCUMENTAL ||--o{ FRAGMENTO : contiene
+    FRAGMENTO ||--o{ EMBEDDING : representa
+    MODELO_EMBEDDING ||--o{ EMBEDDING : genera
+    DOCUMENTO }o--o{ PRODUCTO : referencia
+    DOCUMENTO }o--o{ PROVEEDOR : referencia

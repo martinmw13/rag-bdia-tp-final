@@ -1,0 +1,65 @@
+%% Modelo conceptual: operación comercial y logística
+%% Se muestran atributos con significado de dominio, no claves técnicas.
+erDiagram
+    CATEGORIA_PRODUCTO {
+        string codigo
+        string nombre
+    }
+    PRODUCTO {
+        string codigo
+        string nombre
+        boolean activo
+    }
+    SEGMENTO_CLIENTE {
+        string codigo
+        string nombre
+    }
+    CLIENTE {
+        string codigo
+        string razon_social
+        boolean activo
+    }
+    PROVEEDOR {
+        string codigo
+        string razon_social
+        boolean activo
+    }
+    CONDICION_COMERCIAL {
+        decimal precio_unitario "no negativo"
+        decimal descuento_porcentaje "entre 0 y 100"
+        date vigencia "sin solapamientos por cliente y producto"
+    }
+    PEDIDO {
+        string codigo
+        date fecha
+        string estado
+    }
+    LINEA_PEDIDO {
+        integer numero_linea "único dentro del pedido"
+        integer cantidad "positiva"
+        decimal precio_aplicado "snapshot de la operación"
+        decimal descuento_aplicado "snapshot de la operación"
+    }
+    ENTREGA {
+        string codigo
+        date fecha_programada
+        date fecha_efectiva "existe sólo si está entregada"
+        string estado
+    }
+    INCIDENCIA_OPERATIVA {
+        string codigo
+        date fecha
+        string tipo
+        string estado
+    }
+
+    CATEGORIA_PRODUCTO ||--o{ PRODUCTO : clasifica
+    SEGMENTO_CLIENTE ||--o{ CLIENTE : agrupa
+    PRODUCTO }o--o{ PROVEEDOR : "es abastecido por"
+    CLIENTE ||--o{ CONDICION_COMERCIAL : acuerda
+    PRODUCTO ||--o{ CONDICION_COMERCIAL : aplica_a
+    CLIENTE ||--o{ PEDIDO : realiza
+    PEDIDO ||--|{ LINEA_PEDIDO : contiene
+    PRODUCTO ||--o{ LINEA_PEDIDO : solicitado_en
+    PEDIDO ||--o{ ENTREGA : origina
+    ENTREGA ||--o{ INCIDENCIA_OPERATIVA : registra

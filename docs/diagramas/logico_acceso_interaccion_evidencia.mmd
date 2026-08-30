@@ -1,0 +1,89 @@
+%% Modelo lógico: acceso, interacción, evidencia y auditoría
+%% CLASE_DOCUMENTAL y EMBEDDING son referencias mínimas a la vista documental.
+erDiagram
+    PERFIL_AUTORIZADO {
+        integer id PK
+        string codigo UK
+        string nombre
+        boolean activo "default verdadero"
+    }
+    ACTOR {
+        integer id PK
+        string codigo UK
+        string nombre
+        integer perfil_autorizado_id FK "unicidad conjunta con id"
+        boolean activo "default verdadero"
+    }
+    PERMISO_DOCUMENTAL {
+        integer perfil_id PK,FK
+        integer clase_id PK,FK
+    }
+    CONSULTA {
+        integer id PK
+        integer actor_id FK "parte de FK compuesta a ACTOR"
+        integer perfil_efectivo_id FK "parte de FK compuesta; debe coincidir con ACTOR"
+        string pregunta
+        datetime instante
+    }
+    RESPUESTA {
+        integer id PK
+        integer consulta_id FK,UK "cero o una por consulta"
+        string tipo_resultado "exito exige evidencia; los resultados negativos no la admiten"
+        string contenido
+        datetime instante
+    }
+    RESULTADO_ESTRUCTURADO {
+        integer id PK
+        string tipo_consulta "consulta predefinida, no SQL arbitrario"
+        json parametros "default objeto vacío"
+        json contenido "snapshot inmutable"
+        datetime generado_en
+        string hash "64 caracteres hexadecimales"
+    }
+    EVIDENCIA_DOCUMENTAL {
+        integer id PK
+        integer respuesta_id FK,UK "único con embedding_id y con ranking"
+        integer embedding_id FK,UK "único con respuesta_id"
+        integer ranking UK "positivo; único por respuesta"
+        decimal score
+    }
+    EVIDENCIA_ESTRUCTURADA {
+        integer id PK
+        integer respuesta_id FK,UK "único con resultado_estructurado_id"
+        integer resultado_estructurado_id FK,UK "único con respuesta_id"
+    }
+    EVENTO_AUDITORIA {
+        integer id PK
+        integer actor_id FK "opcional"
+        integer perfil_efectivo_id FK "opcional"
+        datetime instante
+        string accion "valor controlado"
+        string resultado "permitido, denegado o rechazado"
+        string recurso_tipo
+        integer recurso_id "opcional"
+        integer consulta_id FK "opcional"
+        integer respuesta_id FK "opcional"
+        integer ranking "opcional; positivo"
+        decimal score "opcional"
+        json detalles "default objeto vacío"
+    }
+    CLASE_DOCUMENTAL_REF {
+        integer id PK "referencia a la vista documental"
+    }
+    EMBEDDING_REF {
+        integer id PK "referencia a la vista documental"
+    }
+
+    PERFIL_AUTORIZADO ||--o{ ACTOR : asigna
+    PERFIL_AUTORIZADO ||--o{ PERMISO_DOCUMENTAL : recibe
+    CLASE_DOCUMENTAL_REF ||--o{ PERMISO_DOCUMENTAL : habilita
+    ACTOR ||--o{ CONSULTA : formula
+    CONSULTA ||--o| RESPUESTA : origina
+    RESPUESTA ||--o{ EVIDENCIA_DOCUMENTAL : fundamenta
+    EMBEDDING_REF ||--o{ EVIDENCIA_DOCUMENTAL : identifica
+    RESPUESTA ||--o{ EVIDENCIA_ESTRUCTURADA : fundamenta
+    RESULTADO_ESTRUCTURADO ||--o{ EVIDENCIA_ESTRUCTURADA : identifica
+    ACTOR |o--o{ EVENTO_AUDITORIA : origina
+    PERFIL_AUTORIZADO |o--o{ EVENTO_AUDITORIA : registra_perfil
+    CONSULTA |o--o{ EVENTO_AUDITORIA : correlaciona
+    RESPUESTA |o--o{ EVENTO_AUDITORIA : correlaciona

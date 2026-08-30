@@ -1,0 +1,61 @@
+%% Modelo conceptual: acceso, interacción, evidencia y auditoría
+erDiagram
+    PERFIL_AUTORIZADO {
+        string codigo
+        string nombre
+    }
+    ACTOR {
+        string codigo
+        string nombre
+        boolean activo
+    }
+    CLASE_DOCUMENTAL {
+        string codigo
+    }
+    PERMISO_DOCUMENTAL {
+        string regla "la ausencia implica denegación"
+    }
+    CONSULTA {
+        string pregunta
+        datetime instante
+        string perfil_efectivo "debe ser el perfil del actor"
+    }
+    RESPUESTA {
+        string tipo_resultado
+        string contenido
+        datetime instante
+    }
+    EVIDENCIA_DOCUMENTAL {
+        integer ranking "único por respuesta"
+        decimal score
+    }
+    EMBEDDING {
+        vector representacion
+    }
+    RESULTADO_ESTRUCTURADO {
+        string tipo_consulta "consulta operativa predefinida"
+        json contenido "snapshot inmutable"
+        string hash
+    }
+    EVIDENCIA_ESTRUCTURADA {
+        string asociacion "sin duplicados"
+    }
+    EVENTO_AUDITORIA {
+        datetime instante
+        string accion
+        string resultado
+        string recurso
+    }
+
+    PERFIL_AUTORIZADO ||--o{ ACTOR : asigna
+    PERFIL_AUTORIZADO ||--o{ PERMISO_DOCUMENTAL : recibe
+    CLASE_DOCUMENTAL ||--o{ PERMISO_DOCUMENTAL : habilita
+    ACTOR ||--o{ CONSULTA : formula
+    CONSULTA ||--o| RESPUESTA : origina
+    RESPUESTA ||--o{ EVIDENCIA_DOCUMENTAL : fundamenta
+    EMBEDDING ||--o{ EVIDENCIA_DOCUMENTAL : identifica
+    RESPUESTA ||--o{ EVIDENCIA_ESTRUCTURADA : fundamenta
+    RESULTADO_ESTRUCTURADO ||--o{ EVIDENCIA_ESTRUCTURADA : identifica
+    ACTOR |o--o{ EVENTO_AUDITORIA : origina
+    CONSULTA |o--o{ EVENTO_AUDITORIA : correlaciona
+    RESPUESTA |o--o{ EVENTO_AUDITORIA : correlaciona
