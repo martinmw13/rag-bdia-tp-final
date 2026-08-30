@@ -1,3 +1,5 @@
+<img src="image.png" width="100%" alt="">
+
 # Capa de datos para un copiloto RAG interno de una distribuidora mayorista
 
 ## Uso de IA
