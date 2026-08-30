@@ -1,5 +1,17 @@
-En este trabajo diseñamos la capa de datos de un copiloto RAG interno para una distribuidora mayorista. El problema que buscamos resolver es que la información relevante está repartida entre documentos, procedimientos, condiciones comerciales y datos operativos, por lo que encontrar una respuesta confiable puede ser lento y depender del conocimiento informal de las personas.
+Se diseña la capa de datos de un copiloto RAG interno para una distribuidora
+mayorista. La información está repartida entre documentos, procedimientos,
+condiciones comerciales y datos operativos. Por eso, encontrar una respuesta
+confiable puede llevar tiempo y depender del conocimiento informal de otras
+personas.
 
-La solución propuesta usa PostgreSQL como motor principal, junto con las extensiones \texttt{pgvector} y \texttt{btree\_gist}. En la misma base se guardan los datos operativos, los metadatos de los documentos, los fragmentos, los embeddings, los permisos y los eventos de auditoría. Elegimos este enfoque porque permite aplicar la vigencia y los permisos antes de buscar por similitud, lo que excluye del ranking las fuentes vencidas o no autorizadas.
+Se usa PostgreSQL como motor principal, con las extensiones
+\texttt{pgvector} y \texttt{btree\_gist}. La misma base guarda datos
+operativos, metadatos documentales, fragmentos, embeddings, permisos y
+auditoría. Así se aplican la vigencia y los permisos antes de buscar por
+similitud, y las fuentes vencidas o no autorizadas quedan fuera del ranking.
 
-La implementación incluye datos sintéticos reproducibles, siete consultas funcionales y dos pruebas transversales de seguridad y auditoría. Las restricciones de integridad, las políticas RLS y la evidencia asociada a cada respuesta permiten comprobar los contratos principales mediante dos cargas limpias equivalentes. El trabajo no implementa una interfaz, una API ni un modelo de lenguaje real; la prueba termina en la capa de datos.
+La implementación incluye datos sintéticos reproducibles, siete consultas
+funcionales y dos pruebas de seguridad y auditoría. Las restricciones, las
+políticas RLS (seguridad a nivel de fila) y la evidencia de cada respuesta se
+validan mediante dos cargas limpias equivalentes. La prueba termina en la capa
+de datos: no incluye interfaz, API ni un modelo de lenguaje real.

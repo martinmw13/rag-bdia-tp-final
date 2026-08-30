@@ -1,23 +1,20 @@
 \section{Conclusiones}
 
-El trabajo materializa una capa de datos pequeña para un copiloto RAG interno.
-El mismo núcleo relacional conserva hechos operativos, documentos versionados,
-embeddings, permisos, interacción y auditoría. Esta decisión permite que
-vigencia y autorización reduzcan el universo antes del ranking vectorial y que
-cada respuesta conserve la evidencia exacta que la sostuvo.
+Se implementó una capa de datos pequeña para un copiloto RAG interno. PostgreSQL
+guarda datos operativos, documentos versionados, embeddings, permisos,
+interacciones y auditoría. La vigencia y la autorización reducen el universo
+antes del ranking, y cada respuesta conserva la evidencia que la sostuvo.
 
-La prueba funcional demuestra claves y restricciones, invariantes diferidas,
-publicación documental atómica, RLS, privilegios mínimos, auditoría operacional
-append-only y nueve casos verificables. El generador produce los mismos
-archivos, conteos y checksums con semilla 42; la validación recrea dos veces la
-base y compara sus snapshots. Los planes muestran que un \textit{sequential
-scan} es correcto para 36 embeddings, aunque el índice HNSW esté disponible
-para el patrón de crecimiento previsto.
+La prueba funcional valida claves, restricciones, invariantes diferidas,
+publicación atómica, RLS, privilegios mínimos y auditoría append-only mediante
+nueve casos. La semilla 42 produce los mismos archivos, conteos y checksums; la
+validación recrea la base dos veces y compara sus instantáneas. Para 36
+embeddings, una exploración secuencial (\texttt{Seq Scan}) cuesta menos que usar
+HNSW. El índice queda disponible para un corpus mayor.
 
-Los límites son deliberados: no hay autenticación, API, LLM, embeddings reales
-ni infraestructura distribuida. Tampoco se usa la muestra como benchmark. Una
-evolución debería medir primero el crecimiento y, según el cuello observado,
-particionar auditoría, agregar réplicas de lectura, mover archivos a
-almacenamiento de objetos o evaluar un índice vectorial separado. Cualquiera de
-esas decisiones deberá preservar la autorización previa al ranking y la
-trazabilidad histórica.
+No se implementan autenticación, API, LLM, embeddings reales ni infraestructura
+distribuida, y la muestra no se usa como benchmark. Antes de escalar se deben
+medir el crecimiento y los cuellos reales. Según el resultado, se podrá
+particionar la auditoría, agregar réplicas, mover archivos o evaluar un motor
+vectorial separado. Cualquier cambio deberá mantener la autorización antes del
+ranking y la trazabilidad histórica.

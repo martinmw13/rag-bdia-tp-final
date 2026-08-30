@@ -1,29 +1,26 @@
 \section{Propuesta para datos semiestructurados, no estructurados y vectoriales}
 
-Cada fragmento documental es la unidad vectorizada. La tabla
-\texttt{embedding} referencia directamente al fragmento y al modelo; la
-versión, el documento, la vigencia y la clase se alcanzan mediante relaciones.
-La vista \texttt{fragmento\_recuperable} reúne esos datos sin duplicarlos en
-el vector. Las políticas RLS sobre las tablas base agregan el permiso del
-perfil efectivo.
+Cada fragmento documental es una unidad vectorizada. \texttt{embedding}
+referencia al fragmento y al modelo. La versión, el documento, la vigencia y la
+clase se obtienen mediante relaciones. La vista
+\texttt{fragmento\_recuperable} reúne esos datos sin copiarlos en el vector, y
+RLS aplica los permisos del perfil efectivo sobre las tablas base.
 
 Los vectores sintéticos tienen 32 dimensiones, están normalizados y forman
-vecindarios temáticos deterministas. La búsqueda usa distancia coseno mediante
-el operador \texttt{<=>}; ordena de menor a mayor distancia y usa
-\texttt{fragmento\_id} como desempate. El modelo activo cubre todos los
-fragmentos. Cuatro fragmentos conservan además embeddings históricos, que no
-participan en la recuperación vigente.
+vecindarios temáticos deterministas. La búsqueda usa distancia coseno
+(\texttt{<=>}), ordena de menor a mayor y desempata por
+\texttt{fragmento\_id}. El modelo activo cubre todos los fragmentos. Cuatro
+también conservan embeddings históricos, excluidos de la recuperación vigente.
 
-El índice HNSW usa \texttt{vector\_cosine\_ops}. En la muestra, PostgreSQL
-elige un \textit{sequential scan} porque comparar 32 vectores activos cuesta
-menos que recorrer el índice. Una ejecución diagnóstica con
-\texttt{enable\_seqscan = off} confirma que el índice puede resolver el patrón
-top-k; no se fuerza ese plan como resultado de rendimiento.
+El índice HNSW usa \texttt{vector\_cosine\_ops}. La muestra es demasiado
+pequeña para evaluar rendimiento: PostgreSQL elige una exploración secuencial
+(\texttt{Seq Scan}) porque recorrer 32 vectores activos cuesta menos que usar el
+índice. Una ejecución diagnóstica con \texttt{enable\_seqscan = off} confirma
+que HNSW puede resolver el patrón top-k, pero ese plan no se fuerza.
 
-Los riesgos principales son recuperar una versión obsoleta, exponer una clase
-no autorizada, mezclar modelos o presentar una respuesta sin fuente. La vista
-filtra actividad, publicación, vigencia y modelo; RLS limita la clase antes del
-\texttt{ORDER BY} y del \texttt{LIMIT}; la unicidad por fragmento y modelo
-evita duplicados; y la evidencia apunta al \texttt{embedding\_id} exacto. De
-ese modo una respuesta histórica sigue siendo explicable aunque cambie la
-versión vigente.
+La recuperación debe evitar cuatro errores: usar versiones obsoletas, exponer
+clases no autorizadas, mezclar modelos y responder sin fuente. La vista filtra
+actividad, publicación, vigencia y modelo. RLS aplica el permiso antes del
+\texttt{ORDER BY} y del \texttt{LIMIT}; la unicidad evita duplicados; y la
+evidencia guarda el \texttt{embedding\_id} exacto. Así una respuesta histórica
+sigue siendo explicable aunque cambie la versión vigente.

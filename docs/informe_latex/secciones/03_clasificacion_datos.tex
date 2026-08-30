@@ -1,8 +1,8 @@
 \section{Clasificación de los datos según su tipo}
 
-La clasificación combina forma, función y sensibilidad. Una misma entidad
-puede pertenecer a más de una categoría: una consulta es un dato operacional
-durante la interacción y también alimenta análisis posteriores de uso.
+La clasificación considera forma, función y sensibilidad. Una entidad puede
+pertenecer a más de una categoría: una consulta es un dato operativo y también
+puede alimentar análisis posteriores.
 
 \begin{table}[ht]
 \centering
@@ -13,9 +13,9 @@ Tipo & Ejemplos en la solución \\
 \midrule
 Estructurados & Catálogos, productos, clientes, proveedores, condiciones comerciales, pedidos, entregas, permisos, consultas y evidencias. Se representan con columnas tipadas, claves y restricciones. \\
 Semiestructurados & Metadatos de versiones, parámetros y contenido de resultados estructurados, y detalles de auditoría. Se guardan en JSONB porque su forma puede variar dentro de límites controlados. \\
-No estructurados & Archivos Markdown de las versiones documentales. Permanecen fuera de PostgreSQL y se vinculan mediante ruta, MIME type, tamaño y checksum. \\
+No estructurados & Archivos Markdown de las versiones documentales. Permanecen fuera de PostgreSQL y se vinculan mediante ruta, tipo MIME, tamaño y checksum. \\
 Vectoriales & Embeddings sintéticos de los fragmentos documentales, almacenados como \texttt{VECTOR(32)} y asociados a una versión identificable del modelo. \\
-Operacionales & Pedidos, líneas, condiciones comerciales, entregas, incidencias, consultas y respuestas. Sostienen la operación o registran una interacción concreta. \\
+Operativos & Pedidos, líneas, condiciones comerciales, entregas, incidencias, consultas y respuestas. Sostienen la operación o registran una interacción concreta. \\
 Analíticos & Totales por categoría, rankings por segmento, métricas de uso y planes de ejecución. En la prueba se calculan bajo demanda y no justifican un Data Warehouse separado. \\
 Sensibles o restringidos & Condiciones comerciales, incidencias y documentos legales o de cumplimiento. Su visibilidad depende del perfil y de la clase documental. \\
 Auditoría y trazabilidad & Eventos de consulta, acceso, publicación, recuperación y evidencia. Conservan referencias y contexto, pero no duplican el contenido sensible. \\
@@ -24,7 +24,7 @@ Auditoría y trazabilidad & Eventos de consulta, acceso, publicación, recuperac
 \caption{Clasificación de los datos de la solución.}
 \end{table}
 
-Los datos analíticos no se persisten como una segunda fuente de verdad porque
-el volumen y las consultas del TP no lo requieren. Si el historial de uso o la
-auditoría alcanzaran una escala que afectara al núcleo transaccional, podrían
-replicarse en una capa analítica sin cambiar el modelo operativo.
+Los datos analíticos no se guardan por separado porque el volumen y las
+consultas del TP no lo justifican. Si el historial de uso o la auditoría
+afectaran al núcleo transaccional, podrían replicarse en otra capa sin cambiar
+el modelo operativo.

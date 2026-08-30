@@ -1,10 +1,9 @@
 \section{Justificación de la tecnología seleccionada}
 
-La implementación usa PostgreSQL con \texttt{pgvector} y
-\texttt{btree\_gist}. El dominio requiere relaciones fuertes, vigencia
-temporal, autorización por fila, agregaciones SQL y búsqueda vectorial. Un
-único motor puede aplicar esas reglas dentro de la misma transacción y evita
-sincronizar permisos o estados documentales con un índice externo.
+Se usa PostgreSQL con \texttt{pgvector} y \texttt{btree\_gist}. El caso requiere
+relaciones, vigencia temporal, autorización por fila, agregaciones SQL y
+búsqueda vectorial. Un solo motor aplica esas reglas en la misma transacción y
+evita sincronizar permisos y estados con un índice externo.
 
 \begin{table}[ht]
 \centering
@@ -17,14 +16,14 @@ Base documental & Flexibilidad para versiones y metadatos JSON. & Traslada relac
 Clave--valor & Baja latencia para caché o contexto efímero. & No resuelve joins, agregaciones ni trazabilidad histórica como almacenamiento primario. \\
 Columnar & Escritura sostenida de eventos y consultas por rango temporal. & La muestra necesita correlacionar auditoría con actores, consultas y respuestas mediante joins. \\
 Grafo & Recorridos de relaciones variables. & Las relaciones del caso tienen profundidad conocida y se expresan con claves foráneas. \\
-Vectorial dedicada & Mayor throughput de similitud a gran escala. & Exige replicar vigencia y permisos para filtrar antes del top-k y abre un problema de consistencia entre motores. \\
+Vectorial dedicada & Mayor volumen de búsquedas por segundo a gran escala. & Exige replicar vigencia y permisos para filtrar antes del top-k, con riesgo de inconsistencia entre motores. \\
 \bottomrule
 \end{tabularx}
 \caption{Alternativas consideradas frente a PostgreSQL.}
 \end{table}
 
-\texttt{pgvector} aporta el tipo \texttt{VECTOR(32)}, la distancia coseno y
-el índice HNSW. \texttt{btree\_gist} permite combinar igualdad e intervalos en
-restricciones de exclusión. PostgreSQL también aporta transacciones, claves
-foráneas, constraint triggers, roles y RLS, que son centrales para el caso y no
-accesorios de la búsqueda semántica.
+\texttt{pgvector} aporta \texttt{VECTOR(32)}, distancia coseno y el índice HNSW.
+\texttt{btree\_gist} combina igualdad e intervalos en restricciones de
+exclusión. PostgreSQL también ofrece transacciones, claves foráneas, constraint
+triggers, roles y RLS. Estas funciones son centrales para el caso, no accesorios
+de la búsqueda semántica.

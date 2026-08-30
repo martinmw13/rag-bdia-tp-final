@@ -1,7 +1,7 @@
 \section{Consultas representativas}
 
 El conjunto contiene siete consultas funcionales y dos pruebas transversales.
-Cada caso declara parámetros, resultado esperado y orden estable mediante
+Cada caso define sus parámetros, el resultado esperado y un orden estable con
 códigos de negocio.
 
 \begin{table}[ht]
@@ -19,13 +19,13 @@ C5 & Clientes sin pedidos históricos. & Usa \texttt{NOT EXISTS}; devuelve el ú
 C6 & Búsqueda vectorial top-k. & Ordena por distancia coseno y fragmento; el fragmento 10 ocupa la primera posición. \\
 C7 & Recuperación híbrida autorizada. & Combina similitud, vigencia, modelo activo y RLS; Comercial/Compras obtiene primero el fragmento 18 y Operaciones no ve su clase. \\
 C8 & Matriz de autorización. & Recorre las 15 combinaciones perfil--clase y confirma siete denegaciones por ausencia de permiso. \\
-C9 & Trazabilidad e inmutabilidad. & Correlaciona actor, consulta, respuesta, evidencia y auditoría; las modificaciones operacionales de eventos son rechazadas. \\
+C9 & Trazabilidad e inmutabilidad. & Correlaciona actor, consulta, respuesta, evidencia y auditoría; las modificaciones operativas de eventos son rechazadas. \\
 \bottomrule
 \end{tabularx}
 \caption{Siete consultas y dos pruebas transversales.}
 \end{table}
 
-C1--C7 producen los siete pares \texttt{consulta}--\texttt{respuesta} del
-conjunto. C8 y C9 reutilizan esas interacciones para comprobar aislamiento y
-trazabilidad; no crean dos conversaciones adicionales. Esta distinción evita
-confundir cantidad de casos SQL con cantidad de interacciones simuladas.
+C1--C7 producen los siete pares \texttt{consulta}--\texttt{respuesta}. C8 y C9
+reutilizan esas interacciones para comprobar aislamiento y trazabilidad; no
+crean otras conversaciones. Por eso hay nueve casos SQL y siete interacciones
+simuladas.

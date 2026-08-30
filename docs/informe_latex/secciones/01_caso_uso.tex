@@ -1,13 +1,34 @@
 \section{Descripción del caso de uso}
 
-El caso elegido es el de un sistema RAG para consultar documentación técnica. Lo adaptamos al contexto de una distribuidora mayorista, ya que en este tipo de empresa la información está distribuida entre catálogos de productos, condiciones comerciales, pedidos, entregas, incidencias, procedimientos de logística y documentos de proveedores o de cumplimiento. En la práctica, una persona que necesita resolver una consulta debe buscar en varios documentos o preguntarle a alguien que conozca el proceso. Esto puede generar demoras, respuestas diferentes para una misma pregunta y uso de documentación que ya no está vigente.
+Se eligió un sistema RAG para consultar documentación técnica y se lo adaptó a
+una distribuidora mayorista. La información está repartida entre documentos y
+datos operativos. Encontrar una respuesta puede llevar tiempo, depender de
+alguien que conozca el proceso o terminar en el uso de una versión que ya no
+está vigente.
 
-Nuestra propuesta es diseñar la capa de datos que permitiría a un copiloto interno recuperar información relevante y usarla como fuente para responder. El alcance comprende el almacenamiento, la integridad, la autorización, la recuperación y la trazabilidad. El entrenamiento de modelos y la construcción de una aplicación completa quedan fuera de la prueba.
+Se propone la capa de datos que permitiría a un copiloto interno recuperar
+información y usarla como fuente para responder. El alcance incluye
+almacenamiento, integridad, autorización, recuperación y trazabilidad. El
+entrenamiento de modelos y la aplicación completa quedan fuera de la prueba.
 
-Los usuarios principales que consideramos son \textbf{Operaciones y Logística}, que consulta fichas de producto, procedimientos logísticos e incidencias autorizadas; \textbf{Comercial y Compras}, que consulta condiciones comerciales, políticas de venta e información autorizada de proveedores; y \textbf{Administración y Calidad}, que consulta documentación de cumplimiento, documentación legal y la trazabilidad de las respuestas. Además, consideramos servicios internos de ingesta, consulta y administración documental. Estos servicios no representan usuarios finales y tienen permisos mínimos según la tarea que realizan.
+Se consideran tres perfiles. \textbf{Operaciones y Logística} consulta fichas de
+producto, procedimientos e incidencias autorizadas. \textbf{Comercial y
+Compras} consulta condiciones comerciales, políticas de venta e información de
+proveedores. \textbf{Administración y Calidad} accede a documentación legal y
+de cumplimiento, y revisa la trazabilidad. Los servicios de ingesta, consulta y
+administración documental no son usuarios finales y reciben los permisos
+mínimos para su tarea.
 
-El sistema debe poder registrar documentos con versiones, determinar qué versión está vigente, dividir los documentos en fragmentos, asociar embeddings a esos fragmentos y recuperar los más cercanos a una consulta. También debe resolver consultas estructuradas, por ejemplo sobre pedidos, entregas o condiciones comerciales. Para cada respuesta exitosa se guarda la evidencia que indica qué fuente fue utilizada.
+La base registra versiones documentales, identifica cuál está vigente, divide
+su contenido en fragmentos y asocia embeddings. También resuelve consultas
+estructuradas sobre pedidos, entregas o condiciones comerciales. Cada respuesta
+exitosa guarda la evidencia que identifica la fuente utilizada.
 
-Los riesgos más importantes son recuperar contenido no autorizado, usar una versión sustituida o revocada, responder sin poder justificar la fuente y perder la trazabilidad de una consulta anterior. Por este motivo, las tres decisiones centrales del diseño son conservar el historial de versiones, aplicar permisos antes de la recuperación y guardar evidencia y auditoría de las interacciones.
+Los riesgos principales son recuperar contenido no autorizado, usar una versión
+sustituida o revocada y responder sin una fuente verificable. Para evitarlos, se
+conserva el historial, se aplican los permisos antes de la recuperación y se
+guarda evidencia y auditoría de cada interacción.
 
-El alcance del trabajo se limita a la capa de datos. No incluimos frontend, backend, API, autenticación de usuarios, integración real con un LLM ni embeddings generados por un modelo comercial. Estos componentes se consideran posibles consumidores futuros de la base diseñada.
+El alcance se limita a la capa de datos. No se incluyen frontend, backend, API,
+autenticación, integración con un LLM ni embeddings generados por un modelo
+real. Esos componentes podrían consumir la base en una etapa futura.
