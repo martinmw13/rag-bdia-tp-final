@@ -2,15 +2,15 @@
 
 ## Uso responsable de IA
 
-¡Hola, profe! En este trabajo usamos IA para explorar alternativas, revisar la
-consistencia y automatizar tareas mecánicas. Los tres integrantes discutimos y
-aprobamos las decisiones de dominio, alcance, modelado y validación.
+Hola profe! En este trabajo usamos IA como apoyo para explorar alternativas, revisar consistencia y automatizar tareas mecánicas. Las decisiones
+de dominio, alcance, modelado y validación fueron discutidas y aprobadas por los
+tres integrantes.
 
 Como referencia metodológica tomamos el flujo de
-[Matt Pocock](https://github.com/mattpocock/skills), que está buenísimo. Antes de
-implementar, ordenamos las preguntas abiertas en un mapa, resolvimos cada
-decisión y pasamos el resultado a un PRD. Después contrastamos la implementación
-con ese documento.
+[Matt Pocock](https://github.com/mattpocock/skills), esta buenisimo. Antes de implementar, organizamos las preguntas
+abiertas en un mapa compartido, resolvimos cada decisión,
+consolidamos el resultado en un PRD y contrastamos la implementación con ese
+documento.
 
 La trazabilidad del proceso se puede ver en:
 
