@@ -2,24 +2,20 @@
 
 ## Uso responsable de IA
 
-Este trabajo utilizó IA como apoyo para explorar alternativas, contrastar
-documentos, revisar consistencia y automatizar tareas mecánicas. Las decisiones
+Hola profe! En este trabajo usamos IA como apoyo para explorar alternativas, revisar consistencia y automatizar tareas mecánicas. Las decisiones
 de dominio, alcance, modelado y validación fueron discutidas y aprobadas por los
-tres integrantes. La autoría corresponde exclusivamente al grupo.
+tres integrantes. 
 
-Como referencia metodológica tomamos el flujo de ingeniería asistida de
-[Matt Pocock](https://github.com/mattpocock/skills), que su autor distingue del
-"vibe coding" sin controles. Antes de implementar, organizamos las preguntas
-abiertas en un mapa compartido, resolvimos cada decisión entre los integrantes,
+Como referencia metodológica tomamos el flujo de
+[Matt Pocock](https://github.com/mattpocock/skills), esta buenisimo. Antes de implementar, organizamos las preguntas
+abiertas en un mapa compartido, resolvimos cada decisión,
 consolidamos el resultado en un PRD y contrastamos la implementación con ese
 documento.
 
-La trazabilidad del proceso queda disponible en:
+La trazabilidad del proceso se puede ver en:
 
 - [Mapa de decisiones: issue #1](https://github.com/martinmw13/rag-bdia-tp-final/issues/1), con enlaces a las diez decisiones resueltas.
-- [Decisión sobre la organización de entregables: issue #11](https://github.com/martinmw13/rag-bdia-tp-final/issues/11).
-- [PRD final](docs/specs/capa-datos-rag-distribuidora/PRD.md) y [PR #23](https://github.com/martinmw13/rag-bdia-tp-final/pull/23), que eliminó la copia duplicada.
-- [Matriz de cobertura](docs/matriz_cobertura.md), que vincula consigna, informe, implementación y evidencia.
+- [PRD final](docs/specs/capa-datos-rag-distribuidora/PRD.md)
 
 **Trabajo Práctico Integrador — Bases de Datos para Inteligencia Artificial**
 Carrera de Especialización en Inteligencia Artificial
