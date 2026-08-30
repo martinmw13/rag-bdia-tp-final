@@ -76,6 +76,7 @@ tamaño y SHA-256.
 
 ```text
 ├── README.md
+├── compose.yaml                         # PostgreSQL 17 con pgvector (opcional)
 ├── docs/
 │   ├── informe_latex/                  # Fuentes y PDF de revisión del informe
 │   ├── specs/
@@ -108,6 +109,7 @@ tamaño y SHA-256.
 ├── scripts/
 │   ├── generar_datos.py               # Generador del conjunto sintético
 │   ├── cargar_base.sh                 # Recorrido simple de la muestra
+│   ├── cargar_base_docker.sh          # Mismo recorrido mediante Docker Compose
 │   └── validar_base.sh                # Validación exhaustiva en dos cargas
 ```
 
@@ -116,6 +118,35 @@ cargan la base; `03` agrega estructuras de acceso; `04` consulta; `05` aplica la
 seguridad; `06` la prueba; y `07` contiene las validaciones completas.
 
 ## Instrucciones para ejecutar la implementación mínima
+
+### Opción con Docker Compose
+
+Este camino requiere Docker con Compose y Python 3, pero no necesita una
+instalación local de PostgreSQL, `psql` ni pgvector:
+
+```bash
+scripts/cargar_base_docker.sh
+```
+
+El script inicia un único servicio PostgreSQL 17 con pgvector, regenera los
+datos, recrea `rag_distribuidora` y ejecuta los nueve casos. El primer argumento
+permite usar otro nombre de base. Para detener el servicio sin borrar sus datos:
+
+```bash
+docker compose down
+```
+
+El puerto se publica sólo en `127.0.0.1:5432`. Si ese puerto está ocupado, se
+puede elegir otro antes de ejecutar el script, por ejemplo:
+
+```bash
+RAG_POSTGRES_PORT=55432 scripts/cargar_base_docker.sh
+```
+
+> La base indicada **se elimina y se vuelve a crear** dentro del volumen de
+> Docker Compose. No usar el nombre de una base con datos que interesen.
+
+### Opción con PostgreSQL local
 
 ### Requisitos previos
 
