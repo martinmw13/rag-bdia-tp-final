@@ -80,8 +80,7 @@ tamaño y SHA-256.
 │   ├── informe_latex/                  # Fuentes y PDF de revisión del informe
 │   ├── specs/
 │   │   └── capa-datos-rag-distribuidora/
-│   │       ├── PRD.md                 # Especificación del producto
-│   │       └── impl-*.md              # Especificaciones de implementación
+│   │       └── PRD.md                 # Especificación del producto
 │   ├── matriz_cobertura.md            # Requisito → artefacto → evidencia
 │   ├── modelo_conceptual.png          # Diagramas renderizados
 │   ├── modelo_logico_o_equivalente.png
@@ -110,7 +109,6 @@ tamaño y SHA-256.
 │   ├── generar_datos.py               # Generador del conjunto sintético
 │   ├── cargar_base.sh                 # Recorrido simple de la muestra
 │   └── validar_base.sh                # Validación exhaustiva en dos cargas
-└── anexos/material_complementario.md
 ```
 
 Los archivos SQL están numerados por orden de ejecución: `01` y `02` crean y
@@ -257,7 +255,6 @@ mover los archivos a almacenamiento de objetos y particionar
 
 - [Borrador del informe técnico en LaTeX](docs/informe_latex/README.md)
 - [Especificación del producto](docs/specs/capa-datos-rag-distribuidora/PRD.md)
-- [Especificaciones de implementación](docs/specs/capa-datos-rag-distribuidora/)
 - Diagramas: [conceptual](docs/modelo_conceptual.png), [lógico](docs/modelo_logico_o_equivalente.png), [físico](docs/modelo_fisico_o_equivalente.png) y [arquitectura](docs/arquitectura.png); [fuentes Mermaid](docs/diagramas/)
 - [Matriz de cobertura](docs/matriz_cobertura.md)
 - [Modelo de datos vectorial](vectorial/modelo_vectorial.md)

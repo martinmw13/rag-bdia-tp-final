@@ -3,8 +3,8 @@
 Vincula cada requisito de la
 [especificación del producto](specs/capa-datos-rag-distribuidora/PRD.md) con
 el artefacto que lo implementa y la evidencia que lo demuestra. Funciona como
-índice y evita repetir explicaciones de la especificación, las specs de
-implementación o el informe. La columna "Sección del informe" señala dónde se
+índice y evita repetir explicaciones del PRD, la implementación o el informe.
+La columna "Sección del informe" señala dónde se
 desarrolla cada punto en el borrador LaTeX actual.
 
 > El proyecto fuente y su PDF de revisión están en [`docs/informe_latex/`](informe_latex/).
@@ -99,7 +99,7 @@ desarrolla cada punto en el borrador LaTeX actual.
 | Perder reproducibilidad | Fijar reglas, semilla, instante, conteos y checksums | [`generar_datos.py`](../scripts/generar_datos.py), [`manifiesto.json`](../data/ejemplos/manifiesto.json) |
 | Confundir demostración pequeña con rendimiento productivo | Interpretar planes sobre su escala real | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) |
 | Sobredimensionar la arquitectura | Núcleo único; componentes distribuidos como evolución justificada | [`docs/diagramas/arquitectura.mmd`](diagramas/arquitectura.mmd); README §"Limitaciones" |
-| Duplicar decisiones entre entregables | Fuente de autoridad única por artefacto | Esta matriz; tabla "Autoridad de los entregables" en [`impl-validacion-entregables.md`](specs/capa-datos-rag-distribuidora/impl-validacion-entregables.md) |
+| Duplicar decisiones entre entregables | Fuente de autoridad única por artefacto | Esta matriz y las referencias directas al informe y a la implementación |
 
 ## Métricas de éxito
 
@@ -114,7 +114,7 @@ desarrolla cada punto en el borrador LaTeX actual.
 | Planes de ejecución relevantes registrados e interpretados | `EXPLAIN (ANALYZE, BUFFERS)` con y sin índice HNSW | [`evidencias/planes_ejecucion.md`](../evidencias/planes_ejecucion.md) |
 | La documentación cubre todos los puntos obligatorios y permite reproducir la prueba | Esta matriz + README | — |
 
-## Cobertura académica requerida (`impl-validacion-entregables.md`)
+## Cobertura académica requerida
 
 | Tema | Sección del informe | Estado |
 | --- | --- | --- |
